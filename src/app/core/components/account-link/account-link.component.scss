@@ -1,0 +1,20 @@
+@import "variables";
+
+a.btn {
+    background-color: transparent;
+    border: none;
+
+    &:hover {
+        background-color: $light;
+    }
+}
+
+.username:hover {
+    background-color: #444444;
+    border-radius: 25px;
+    border: 1px solid #f59e0b;
+}
+
+.username {
+    padding: 0.65rem;
+}

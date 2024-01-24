@@ -1,0 +1,12 @@
+<div *ngIf="activeCustomer$ | async as customer; else notLoggedIn">
+    <div *ngIf="userName(customer) as userDisplayName"
+        class="username"
+    >
+        <vsf-user-profile-dropdown [userName]="userDisplayName"></vsf-user-profile-dropdown>
+    </div>
+</div>
+<ng-template #notLoggedIn>
+    <a class="btn btn-light text-muted" [routerLink]="['account/sign-in']">
+        <fa-icon icon="user-circle"></fa-icon>
+        <span class="d-none d-sm-inline ml-1 ">Sign In</span></a>
+</ng-template>

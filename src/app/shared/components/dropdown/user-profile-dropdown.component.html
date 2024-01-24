@@ -1,0 +1,40 @@
+<div class="user-profile-dropdown">
+    <button
+        (click)="toggleDropdown()"
+    >
+        <span class="d-none d-sm-inline ml-1">
+            <fa-icon icon="user-circle" class="mr-2 fa-lg text-green-300 fa-inverse"></fa-icon>
+            {{ userName }}
+        </span>
+    </button>
+    <div *ngIf="isDropdownOpen"
+        (mouseleave)="toggleDropdown()"
+        class="dropdown-content"
+    >
+        <a routerLink="/account">
+            <fa-icon icon="male" class="mr-2"></fa-icon>
+            Profile
+        </a>
+        <a routerLink="/account/orders">
+            <fa-icon icon="history" class="mr-2"></fa-icon>
+            Orders
+        </a>
+        <a routerLink="/account/address-book">
+            <fa-icon icon="address-book" class="mr-2"></fa-icon>
+            Adress Book
+        </a>
+        <a routerLink="/account/details">
+            <fa-icon icon="info" class="mr-2"></fa-icon>
+            Personal details
+        </a>
+        <a routerLink="/account/change-credentials">
+            <fa-icon icon="edit" class="mr-2"></fa-icon>
+            Change credentials
+        </a>
+        <a class="handPointer" (click)="logOut()">
+            <fa-icon icon="sign-out" class="mr-2"></fa-icon>
+            Logout
+        </a>
+    </div>
+</div>
+
