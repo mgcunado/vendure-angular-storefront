@@ -38,6 +38,7 @@ import {
 } from './checkout-shipping.graphql';
 
 export type AddressFormValue = Pick<AddressFragment, Exclude<keyof AddressFragment, 'country'>> & { countryCode: string; };
+// export type AddressFormValue = Pick<AddressFragment, Exclude<keyof AddressFragment, 'country' | 'province2'>> & { countryCode: string; provinceCode: string; };
 
 @Component({
     selector: 'vsf-checkout-shipping',
@@ -57,18 +58,19 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     shippingMethodId: string | undefined;
     contactForm: UntypedFormGroup;
     private destroy$ = new Subject<void>();
+    countryId = '';
 
     constructor(private dataService: DataService,
-                private stateService: StateService,
-                private changeDetector: ChangeDetectorRef,
-                private modalService: ModalService,
-                private notificationService: NotificationService,
-                private formBuilder: UntypedFormBuilder,
-                private route: ActivatedRoute,
-                private router: Router) {
+        private stateService: StateService,
+        private changeDetector: ChangeDetectorRef,
+        private modalService: ModalService,
+        private notificationService: NotificationService,
+        private formBuilder: UntypedFormBuilder,
+        private route: ActivatedRoute,
+        private router: Router) {
     }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.contactForm = this.formBuilder.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
@@ -83,9 +85,16 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             map(addresses => addresses[0]),
             first()
         );
+        this.customerAddress$.subscribe((address: AddressFragment) => {
+            if (address && address.country) {
+                this.countryId = address.country.id;
+            }
+        });
+
         this.availableCountries$ = this.dataService.query<GetAvailableCountriesQuery>(GET_AVAILABLE_COUNTRIES).pipe(
             map(data => data.availableCountries),
         );
+
         const shippingData$ = this.dataService.query<GetOrderShippingDataQuery>(GET_ORDER_SHIPPING_DATA);
         this.shippingAddress$ = shippingData$.pipe(
             map(data => data.activeOrder && data.activeOrder.shippingAddress),
@@ -99,14 +108,14 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             map(data => data.activeOrder && data.activeOrder.customer),
             takeUntil(this.destroy$)
         ).subscribe(customer => {
-            if (customer) {
-                this.contactForm.patchValue({
-                    firstName: customer.firstName,
-                    lastName: customer.lastName,
-                    emailAddress: customer.emailAddress,
-                }, {emitEvent: false});
-            }
-        });
+                if (customer) {
+                    this.contactForm.patchValue({
+                        firstName: customer.firstName,
+                        lastName: customer.lastName,
+                        emailAddress: customer.emailAddress,
+                    }, {emitEvent: false});
+                }
+            });
     }
 
     ngOnDestroy() {
@@ -120,7 +129,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             address.company,
             address.streetLine1,
             address.streetLine2,
-            address.province,
+            address?.province2?.name,
             address.postalCode,
             address.country.name,
         ].filter(notNullOrUndefined);
@@ -133,8 +142,8 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             },
             closable: true,
         }).pipe(
-            switchMap(() => this.dataService.query<GetCustomerAddressesQuery>(GET_CUSTOMER_ADDRESSES, {}, 'network-only')),
-        )
+                switchMap(() => this.dataService.query<GetCustomerAddressesQuery>(GET_CUSTOMER_ADDRESSES, {}, 'network-only')),
+            )
             .subscribe();
     }
 
@@ -157,8 +166,8 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
         this.dataService.mutate<SetShippingAddressMutation, SetShippingAddressMutationVariables>(SET_SHIPPING_ADDRESS, {
             input,
         }).subscribe(data => {
-            this.changeDetector.markForCheck();
-        });
+                this.changeDetector.markForCheck();
+            });
     }
 
     setShippingMethod(id: string) {
@@ -177,8 +186,8 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
                 ),
                 mergeMap(() => this.dataService.mutate<TransitionToArrangingPaymentMutation>(TRANSITION_TO_ARRANGING_PAYMENT)),
             ).subscribe((data) => {
-                this.router.navigate(['../payment'], {relativeTo: this.route});
-            });
+                    this.router.navigate(['../payment'], {relativeTo: this.route});
+                });
         }
     }
 
@@ -191,12 +200,12 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             return this.dataService.mutate<SetCustomerForOrderMutation, SetCustomerForOrderMutationVariables>(SET_CUSTOMER_FOR_ORDER, {
                 input: this.contactForm.value,
             }).pipe(
-                tap(({setCustomerForOrder}) => {
-                    if (setCustomerForOrder && setCustomerForOrder.__typename !== 'Order') {
-                        this.notificationService.error((setCustomerForOrder as any).message).subscribe();
-                    }
-                })
-            );
+                    tap(({setCustomerForOrder}) => {
+                        if (setCustomerForOrder && setCustomerForOrder.__typename !== 'Order') {
+                            this.notificationService.error((setCustomerForOrder as any).message).subscribe();
+                        }
+                    })
+                );
         }
     }
 
@@ -210,7 +219,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             fullName: value.fullName || '',
             phoneNumber: value.phoneNumber || '',
             postalCode: value.postalCode || '',
-            province: value.province || '',
+            province: value?.province2?.code || '',
             streetLine1: value.streetLine1 || '',
             streetLine2: value.streetLine2 || '',
         };

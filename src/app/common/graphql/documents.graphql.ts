@@ -1,7 +1,8 @@
 import {gql} from 'apollo-angular';
 
 
-import { ADDRESS_FRAGMENT, ASSET_FRAGMENT, COUNTRY_FRAGMENT } from './fragments.graphql';
+// import { ADDRESS_FRAGMENT, ASSET_FRAGMENT, COUNTRY_FRAGMENT } from './fragments.graphql';
+import { ADDRESS_FRAGMENT, ASSET_FRAGMENT, COUNTRY_FRAGMENT, PROVINCE_FRAGMENT } from './fragments.graphql';
 
 export const GET_CUSTOMER_ADDRESSES = gql`
     query GetCustomerAddresses {
@@ -22,6 +23,15 @@ export const GET_AVAILABLE_COUNTRIES = gql`
         }
     }
     ${COUNTRY_FRAGMENT}
+`;
+
+export const GET_AVAILABLE_PROVINCES = gql`
+    query GetAvailableProvinces($countryId: ID!) {
+        availableProvinces(countryId: $countryId) {
+            ...Province
+        }
+    }
+    ${PROVINCE_FRAGMENT}
 `;
 
 export const GET_ACTIVE_CUSTOMER = gql`

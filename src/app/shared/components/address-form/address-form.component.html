@@ -5,7 +5,7 @@
                 htmlFor="fullName"
                 class="block text-sm font-medium text-gray-700"
             >
-                First name
+                Full name
             </label>
             <div class="mt-1">
                 <input
@@ -19,24 +19,24 @@
             </div>
         </div>
 
-        <div class="sm:col-span-2">
-            <label
-                htmlFor="company"
-                class="block text-sm font-medium text-gray-700"
-            >
-                Company
-            </label>
-            <div class="mt-1">
-                <input
-                    type="text"
-                    name="company"
-                    id="company"
-                    formControlName="company"
-                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500
-            sm:text-sm"
-                />
-            </div>
-        </div>
+        <!-- <div class="sm:col-span-2"> -->
+        <!--     <label -->
+        <!--         htmlFor="company" -->
+        <!--         class="block text-sm font-medium text-gray-700" -->
+        <!--     > -->
+        <!--         Company -->
+        <!--     </label> -->
+        <!--     <div class="mt-1"> -->
+        <!--         <input -->
+        <!--             type="text" -->
+        <!--             name="company" -->
+        <!--             id="company" -->
+        <!--             formControlName="company" -->
+        <!--             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 -->
+        <!--     sm:text-sm" -->
+        <!--         /> -->
+        <!--     </div> -->
+        <!-- </div> -->
 
         <div class="sm:col-span-2">
             <label
@@ -58,24 +58,24 @@
             </div>
         </div>
 
-        <div class="sm:col-span-2">
-            <label
-                htmlFor="streetLine2"
-                class="block text-sm font-medium text-gray-700"
-            >
-                Apartment, suite, etc.
-            </label>
-            <div class="mt-1">
-                <input
-                    type="text"
-                    name="streetLine2"
-                    id="streetLine2"
-                    formControlName="streetLine2"
-                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500
-            sm:text-sm"
-                />
-            </div>
-        </div>
+        <!-- <div class="sm:col-span-2"> -->
+        <!--     <label -->
+        <!--         htmlFor="streetLine2" -->
+        <!--         class="block text-sm font-medium text-gray-700" -->
+        <!--     > -->
+        <!--         Apartment, suite, etc. -->
+        <!--     </label> -->
+        <!--     <div class="mt-1"> -->
+        <!--         <input -->
+        <!--             type="text" -->
+        <!--             name="streetLine2" -->
+        <!--             id="streetLine2" -->
+        <!--             formControlName="streetLine2" -->
+        <!--             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 -->
+        <!--     sm:text-sm" -->
+        <!--         /> -->
+        <!--     </div> -->
+        <!-- </div> -->
 
         <div>
             <label
@@ -120,20 +120,38 @@
                 htmlFor="province"
                 class="block text-sm font-medium text-gray-700"
             >
-                State / Province
+                Province
             </label>
             <div class="mt-1">
-                <input
-                    type="text"
-                    name="province"
-                    id="province"
-                    formControlName="province"
-                    autoComplete="address-level1"
-                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500
-            sm:text-sm"
-                />
+                <select
+                    class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    formControlName="province" id="province">
+                    <option *ngFor="let province of availableProvinces" [ngValue]="province.code">
+                        {{ province.name }}
+                    </option>
+                </select>
             </div>
         </div>
+
+        <!-- <div> -->
+        <!--     <label -->
+        <!--         htmlFor="province" -->
+        <!--         class="block text-sm font-medium text-gray-700" -->
+        <!--     > -->
+        <!--         State / Province -->
+        <!--     </label> -->
+        <!--     <div class="mt-1"> -->
+        <!--         <input -->
+        <!--             type="text" -->
+        <!--             name="province" -->
+        <!--             id="province" -->
+        <!--             formControlName="province" -->
+        <!--             autoComplete="address-level1" -->
+        <!--             class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 -->
+        <!--     sm:text-sm" -->
+        <!--         /> -->
+        <!--     </div> -->
+        <!-- </div> -->
 
         <div>
             <label

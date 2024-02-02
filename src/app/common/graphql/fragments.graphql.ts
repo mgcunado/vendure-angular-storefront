@@ -81,6 +81,15 @@ export const COUNTRY_FRAGMENT = gql`
     }
 `;
 
+export const PROVINCE_FRAGMENT = gql`
+    fragment Province on Province {
+        id
+        code
+        name
+        enabled
+    }
+`;
+
 export const ORDER_ADDRESS_FRAGMENT = gql`
     fragment OrderAddress on OrderAddress {
         fullName
@@ -89,6 +98,11 @@ export const ORDER_ADDRESS_FRAGMENT = gql`
         streetLine2
         city
         province
+        province2 {
+            id
+            code
+            name
+        }
         postalCode
         country
         phoneNumber
@@ -104,6 +118,11 @@ export const ADDRESS_FRAGMENT = gql`
         streetLine2
         city
         province
+        province2 {
+            id
+            code
+            name
+        }
         postalCode
         country {
             id

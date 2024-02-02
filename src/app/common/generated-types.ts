@@ -1,3 +1,4 @@
+// eslint-disable
 export type Maybe<T> = T;
 export type InputMaybe<T> = T;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -10,13 +11,9 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
   DateTime: any;
-  /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
-  /** The `Money` scalar type represents monetary values and supports signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point). */
   Money: any;
-  /** The `Upload` scalar type represents a file upload. */
   Upload: any;
 };
 
@@ -38,6 +35,7 @@ export type Address = Node & {
   phoneNumber?: Maybe<Scalars['String']>;
   postalCode?: Maybe<Scalars['String']>;
   province?: Maybe<Scalars['String']>;
+  province2?: Maybe<Province>;
   streetLine1: Scalars['String'];
   streetLine2?: Maybe<Scalars['String']>;
   updatedAt: Scalars['DateTime'];
@@ -921,7 +919,14 @@ export type Facet = Node & {
   name: Scalars['String'];
   translations: Array<FacetTranslation>;
   updatedAt: Scalars['DateTime'];
+  /** Returns a paginated, sortable, filterable list of the Facet's values. Added in v2.1.0. */
+  valueList: FacetValueList;
   values: Array<FacetValue>;
+};
+
+
+export type FacetValueListArgs = {
+  options?: InputMaybe<FacetValueListOptions>;
 };
 
 export type FacetFilterParameter = {
@@ -975,6 +980,7 @@ export type FacetValue = Node & {
   createdAt: Scalars['DateTime'];
   customFields?: Maybe<Scalars['JSON']>;
   facet: Facet;
+  facetId: Scalars['ID'];
   id: Scalars['ID'];
   languageCode: LanguageCode;
   name: Scalars['String'];
@@ -995,6 +1001,35 @@ export type FacetValueFilterInput = {
   or?: InputMaybe<Array<Scalars['ID']>>;
 };
 
+export type FacetValueFilterParameter = {
+  code?: InputMaybe<StringOperators>;
+  createdAt?: InputMaybe<DateOperators>;
+  facetId?: InputMaybe<IdOperators>;
+  id?: InputMaybe<IdOperators>;
+  languageCode?: InputMaybe<StringOperators>;
+  name?: InputMaybe<StringOperators>;
+  updatedAt?: InputMaybe<DateOperators>;
+};
+
+export type FacetValueList = PaginatedList & {
+  __typename?: 'FacetValueList';
+  items: Array<FacetValue>;
+  totalItems: Scalars['Int'];
+};
+
+export type FacetValueListOptions = {
+  /** Allows the results to be filtered */
+  filter?: InputMaybe<FacetValueFilterParameter>;
+  /** Specifies whether multiple "filter" arguments should be combines with a logical AND or OR operation. Defaults to AND. */
+  filterOperator?: InputMaybe<LogicalOperator>;
+  /** Skips the first n results, for use in pagination */
+  skip?: InputMaybe<Scalars['Int']>;
+  /** Specifies which properties to sort the results by */
+  sort?: InputMaybe<FacetValueSortParameter>;
+  /** Takes n results, for use in pagination */
+  take?: InputMaybe<Scalars['Int']>;
+};
+
 /**
  * Which FacetValues are present in the products returned
  * by the search, and in what quantity.
@@ -1003,6 +1038,15 @@ export type FacetValueResult = {
   __typename?: 'FacetValueResult';
   count: Scalars['Int'];
   facetValue: FacetValue;
+};
+
+export type FacetValueSortParameter = {
+  code?: InputMaybe<SortOrder>;
+  createdAt?: InputMaybe<SortOrder>;
+  facetId?: InputMaybe<SortOrder>;
+  id?: InputMaybe<SortOrder>;
+  name?: InputMaybe<SortOrder>;
+  updatedAt?: InputMaybe<SortOrder>;
 };
 
 export type FacetValueTranslation = {
@@ -1617,11 +1661,11 @@ export type Mutation = {
    * _If `authOptions.requireVerification` is set to `true`:_
    *
    * 1. **The Customer is registered _with_ a password**. A verificationToken will be created (and typically emailed to the Customer). That
-   * verificationToken would then be passed to the `verifyCustomerAccount` mutation _without_ a password. The Customer is then
-   * verified and authenticated in one step.
+   *    verificationToken would then be passed to the `verifyCustomerAccount` mutation _without_ a password. The Customer is then
+   *    verified and authenticated in one step.
    * 2. **The Customer is registered _without_ a password**. A verificationToken will be created (and typically emailed to the Customer). That
-   * verificationToken would then be passed to the `verifyCustomerAccount` mutation _with_ the chosen password of the Customer. The Customer is then
-   * verified and authenticated in one step.
+   *    verificationToken would then be passed to the `verifyCustomerAccount` mutation _with_ the chosen password of the Customer. The Customer is then
+   *    verified and authenticated in one step.
    *
    * _If `authOptions.requireVerification` is set to `false`:_
    *
@@ -1961,6 +2005,7 @@ export type OrderAddress = {
   phoneNumber?: Maybe<Scalars['String']>;
   postalCode?: Maybe<Scalars['String']>;
   province?: Maybe<Scalars['String']>;
+  province2?: Maybe<Province>;
   streetLine1?: Maybe<Scalars['String']>;
   streetLine2?: Maybe<Scalars['String']>;
 };
@@ -2041,6 +2086,7 @@ export type OrderLine = Node & {
   proratedUnitPrice: Scalars['Money'];
   /** The proratedUnitPrice including tax */
   proratedUnitPriceWithTax: Scalars['Money'];
+  /** The quantity of items purchased */
   quantity: Scalars['Int'];
   taxLines: Array<TaxLine>;
   taxRate: Scalars['Float'];
@@ -2272,10 +2318,10 @@ export type PaymentMethodTranslation = {
  * \@Query()
  * \@Allow(Permission.Owner)
  * async activeCustomer(\@Ctx() ctx: RequestContext): Promise<Customer | undefined> {
- * const userId = ctx.activeUserId;
- * if (userId) {
- * return this.customerService.findOneByUserId(ctx, userId);
- * }
+ *   const userId = ctx.activeUserId;
+ *   if (userId) {
+ *     return this.customerService.findOneByUserId(ctx, userId);
+ *   }
  * }
  * ```
  *
@@ -2697,6 +2743,7 @@ export type Promotion = Node & {
   startsAt?: Maybe<Scalars['DateTime']>;
   translations: Array<PromotionTranslation>;
   updatedAt: Scalars['DateTime'];
+  usageLimit?: Maybe<Scalars['Int']>;
 };
 
 export type PromotionList = PaginatedList & {
@@ -2751,6 +2798,8 @@ export type Query = {
   activeOrder?: Maybe<Order>;
   /** An array of supported Countries */
   availableCountries: Array<Country>;
+  /** An array of supported Countries */
+  availableProvinces: Array<Province>;
   /** Returns a Collection either by its id or slug. If neither 'id' nor 'slug' is specified, an error will result. */
   collection?: Maybe<Collection>;
   /** A list of Collections available to the shop */
@@ -2785,6 +2834,11 @@ export type Query = {
   products: ProductList;
   /** Search Products based on the criteria set by the `SearchInput` */
   search: SearchResponse;
+};
+
+
+export type QueryAvailableProvincesArgs = {
+  countryId: Scalars['ID'];
 };
 
 
@@ -2942,6 +2996,7 @@ export type SearchInput = {
   collectionSlug?: InputMaybe<Scalars['String']>;
   facetValueFilters?: InputMaybe<Array<FacetValueFilterInput>>;
   groupByProduct?: InputMaybe<Scalars['Boolean']>;
+  inStock?: InputMaybe<Scalars['Boolean']>;
   skip?: InputMaybe<Scalars['Int']>;
   sort?: InputMaybe<SearchResultSortParameter>;
   take?: InputMaybe<Scalars['Int']>;
@@ -2969,6 +3024,7 @@ export type SearchResult = {
   description: Scalars['String'];
   facetIds: Array<Scalars['ID']>;
   facetValueIds: Array<Scalars['ID']>;
+  inStock: Scalars['Boolean'];
   price: SearchResultPrice;
   priceWithTax: SearchResultPrice;
   productAsset?: Maybe<SearchResultAsset>;
@@ -3285,7 +3341,7 @@ export type UpdateAddressMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAddressMutation = { __typename?: 'Mutation', updateCustomerAddress: { __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, country: { __typename?: 'Country', id: string, code: string, name: string } } };
+export type UpdateAddressMutation = { __typename?: 'Mutation', updateCustomerAddress: { __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, province2?: { __typename?: 'Province', id: string, code: string, name: string }, country: { __typename?: 'Country', id: string, code: string, name: string } } };
 
 export type ChangePasswordMutationVariables = Exact<{
   old: Scalars['String'];
@@ -3320,7 +3376,7 @@ export type GetOrderQueryVariables = Exact<{
 }>;
 
 
-export type GetOrderQuery = { __typename?: 'Query', orderByCode?: { __typename?: 'Order', id: string, code: string, state: string, active: boolean, updatedAt: any, orderPlacedAt?: any, totalQuantity: number, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shipping: any, shippingWithTax: any, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string }, billingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string }, lines: Array<{ __typename?: 'OrderLine', id: string, unitPrice: any, unitPriceWithTax: any, quantity: number, linePriceWithTax: any, discountedLinePriceWithTax: any, featuredAsset?: { __typename?: 'Asset', id: string, width: number, height: number, name: string, preview: string, focalPoint?: { __typename?: 'Coordinate', x: number, y: number } }, productVariant: { __typename?: 'ProductVariant', id: string, name: string }, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> }>, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, code: string, name: string, description: string } }>, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> } };
+export type GetOrderQuery = { __typename?: 'Query', orderByCode?: { __typename?: 'Order', id: string, code: string, state: string, active: boolean, updatedAt: any, orderPlacedAt?: any, totalQuantity: number, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shipping: any, shippingWithTax: any, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string, province2?: { __typename?: 'Province', id: string, code: string, name: string } }, billingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string, province2?: { __typename?: 'Province', id: string, code: string, name: string } }, lines: Array<{ __typename?: 'OrderLine', id: string, unitPrice: any, unitPriceWithTax: any, quantity: number, linePriceWithTax: any, discountedLinePriceWithTax: any, featuredAsset?: { __typename?: 'Asset', id: string, width: number, height: number, name: string, preview: string, focalPoint?: { __typename?: 'Coordinate', x: number, y: number } }, productVariant: { __typename?: 'ProductVariant', id: string, name: string }, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> }>, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, code: string, name: string, description: string } }>, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> } };
 
 export type GetOrderListQueryVariables = Exact<{
   options?: InputMaybe<OrderListOptions>;
@@ -3403,14 +3459,14 @@ export type TransitionToAddingItemsMutation = { __typename?: 'Mutation', transit
 export type GetOrderShippingDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetOrderShippingDataQuery = { __typename?: 'Query', activeOrder?: { __typename?: 'Order', id: string, customer?: { __typename?: 'Customer', id: string, firstName: string, lastName: string, emailAddress: string }, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string } } };
+export type GetOrderShippingDataQuery = { __typename?: 'Query', activeOrder?: { __typename?: 'Order', id: string, customer?: { __typename?: 'Customer', id: string, firstName: string, lastName: string, emailAddress: string }, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string, province2?: { __typename?: 'Province', id: string, code: string, name: string } } } };
 
 export type SetShippingAddressMutationVariables = Exact<{
   input: CreateAddressInput;
 }>;
 
 
-export type SetShippingAddressMutation = { __typename?: 'Mutation', setOrderShippingAddress: { __typename?: 'NoActiveOrderError', errorCode: ErrorCode, message: string } | { __typename?: 'Order', id: string, code: string, state: string, active: boolean, updatedAt: any, orderPlacedAt?: any, totalQuantity: number, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shipping: any, shippingWithTax: any, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string }, lines: Array<{ __typename?: 'OrderLine', id: string, unitPrice: any, unitPriceWithTax: any, quantity: number, linePriceWithTax: any, discountedLinePriceWithTax: any, featuredAsset?: { __typename?: 'Asset', id: string, width: number, height: number, name: string, preview: string, focalPoint?: { __typename?: 'Coordinate', x: number, y: number } }, productVariant: { __typename?: 'ProductVariant', id: string, name: string }, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> }>, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, code: string, name: string, description: string } }>, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> } };
+export type SetShippingAddressMutation = { __typename?: 'Mutation', setOrderShippingAddress: { __typename?: 'NoActiveOrderError', errorCode: ErrorCode, message: string } | { __typename?: 'Order', id: string, code: string, state: string, active: boolean, updatedAt: any, orderPlacedAt?: any, totalQuantity: number, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shipping: any, shippingWithTax: any, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string, province2?: { __typename?: 'Province', id: string, code: string, name: string } }, lines: Array<{ __typename?: 'OrderLine', id: string, unitPrice: any, unitPriceWithTax: any, quantity: number, linePriceWithTax: any, discountedLinePriceWithTax: any, featuredAsset?: { __typename?: 'Asset', id: string, width: number, height: number, name: string, preview: string, focalPoint?: { __typename?: 'Coordinate', x: number, y: number } }, productVariant: { __typename?: 'ProductVariant', id: string, name: string }, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> }>, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, code: string, name: string, description: string } }>, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> } };
 
 export type GetEligibleShippingMethodsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3439,17 +3495,24 @@ export type TransitionToArrangingPaymentMutation = { __typename?: 'Mutation', tr
 export type GetOrderForCheckoutQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetOrderForCheckoutQuery = { __typename?: 'Query', activeOrder?: { __typename?: 'Order', id: string, code: string, state: string, active: boolean, updatedAt: any, orderPlacedAt?: any, totalQuantity: number, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shipping: any, shippingWithTax: any, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string }, lines: Array<{ __typename?: 'OrderLine', id: string, unitPrice: any, unitPriceWithTax: any, quantity: number, linePriceWithTax: any, discountedLinePriceWithTax: any, featuredAsset?: { __typename?: 'Asset', id: string, width: number, height: number, name: string, preview: string, focalPoint?: { __typename?: 'Coordinate', x: number, y: number } }, productVariant: { __typename?: 'ProductVariant', id: string, name: string }, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> }>, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, code: string, name: string, description: string } }>, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> } };
+export type GetOrderForCheckoutQuery = { __typename?: 'Query', activeOrder?: { __typename?: 'Order', id: string, code: string, state: string, active: boolean, updatedAt: any, orderPlacedAt?: any, totalQuantity: number, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shipping: any, shippingWithTax: any, shippingAddress?: { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string, province2?: { __typename?: 'Province', id: string, code: string, name: string } }, lines: Array<{ __typename?: 'OrderLine', id: string, unitPrice: any, unitPriceWithTax: any, quantity: number, linePriceWithTax: any, discountedLinePriceWithTax: any, featuredAsset?: { __typename?: 'Asset', id: string, width: number, height: number, name: string, preview: string, focalPoint?: { __typename?: 'Coordinate', x: number, y: number } }, productVariant: { __typename?: 'ProductVariant', id: string, name: string }, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> }>, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, code: string, name: string, description: string } }>, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> } };
 
 export type GetCustomerAddressesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCustomerAddressesQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, addresses?: Array<{ __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, country: { __typename?: 'Country', id: string, code: string, name: string } }> } };
+export type GetCustomerAddressesQuery = { __typename?: 'Query', activeCustomer?: { __typename?: 'Customer', id: string, addresses?: Array<{ __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, province2?: { __typename?: 'Province', id: string, code: string, name: string }, country: { __typename?: 'Country', id: string, code: string, name: string } }> } };
 
 export type GetAvailableCountriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAvailableCountriesQuery = { __typename?: 'Query', availableCountries: Array<{ __typename?: 'Country', id: string, code: string, name: string, enabled: boolean }> };
+
+export type GetAvailableProvincesQueryVariables = Exact<{
+  countryId: Scalars['ID'];
+}>;
+
+
+export type GetAvailableProvincesQuery = { __typename?: 'Query', availableProvinces: Array<{ __typename?: 'Province', id: string, code: string, name: string, enabled: boolean }> };
 
 export type GetActiveCustomerQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3469,9 +3532,11 @@ export type CartFragment = { __typename?: 'Order', id: string, code: string, sta
 
 export type CountryFragment = { __typename?: 'Country', id: string, code: string, name: string, enabled: boolean };
 
-export type OrderAddressFragment = { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string };
+export type ProvinceFragment = { __typename?: 'Province', id: string, code: string, name: string, enabled: boolean };
 
-export type AddressFragment = { __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, country: { __typename?: 'Country', id: string, code: string, name: string } };
+export type OrderAddressFragment = { __typename?: 'OrderAddress', fullName?: string, company?: string, streetLine1?: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, country?: string, phoneNumber?: string, province2?: { __typename?: 'Province', id: string, code: string, name: string } };
+
+export type AddressFragment = { __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, province2?: { __typename?: 'Province', id: string, code: string, name: string }, country: { __typename?: 'Country', id: string, code: string, name: string } };
 
 type ErrorResult_AlreadyLoggedInError_Fragment = { __typename?: 'AlreadyLoggedInError', errorCode: ErrorCode, message: string };
 
@@ -3593,7 +3658,7 @@ export type CreateAddressMutationVariables = Exact<{
 }>;
 
 
-export type CreateAddressMutation = { __typename?: 'Mutation', createCustomerAddress: { __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, country: { __typename?: 'Country', id: string, code: string, name: string } } };
+export type CreateAddressMutation = { __typename?: 'Mutation', createCustomerAddress: { __typename?: 'Address', id: string, fullName?: string, company?: string, streetLine1: string, streetLine2?: string, city?: string, province?: string, postalCode?: string, phoneNumber?: string, defaultShippingAddress?: boolean, defaultBillingAddress?: boolean, province2?: { __typename?: 'Province', id: string, code: string, name: string }, country: { __typename?: 'Country', id: string, code: string, name: string } } };
 
 export type SignInMutationVariables = Exact<{
   emailAddress: Scalars['String'];
