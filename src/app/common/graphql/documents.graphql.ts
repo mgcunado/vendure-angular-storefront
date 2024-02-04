@@ -34,6 +34,15 @@ export const GET_AVAILABLE_PROVINCES = gql`
     ${PROVINCE_FRAGMENT}
 `;
 
+export const GET_PROVINCE_BY_CODE = gql`
+    query GetProvinceByCode($countryId: ID!, $code: String!) {
+        provinceByCode(countryId: $countryId, code: $code) {
+            ...Province
+        }
+    }
+    ${PROVINCE_FRAGMENT}
+`;
+
 export const GET_ACTIVE_CUSTOMER = gql`
     query GetActiveCustomer {
         activeCustomer {

@@ -5,13 +5,12 @@ import { filter, map, switchMap } from 'rxjs/operators';
 
 import {
     GetAvailableCountriesQuery,
-    GetAvailableProvincesQuery,
     GetCustomerAddressesQuery,
     UpdateAddressInput,
     UpdateAddressMutation,
     UpdateAddressMutationVariables
 } from '../../../common/generated-types';
-import { GET_AVAILABLE_COUNTRIES, GET_AVAILABLE_PROVINCES, GET_CUSTOMER_ADDRESSES } from '../../../common/graphql/documents.graphql';
+import { GET_AVAILABLE_COUNTRIES, GET_CUSTOMER_ADDRESSES } from '../../../common/graphql/documents.graphql';
 import { notNullOrUndefined } from '../../../common/utils/not-null-or-undefined';
 import { DataService } from '../../../core/providers/data/data.service';
 import { AddressFormComponent } from '../../../shared/components/address-form/address-form.component';
@@ -28,11 +27,14 @@ export class AccountAddressDetailComponent implements OnInit {
 
     address$: Observable<NonNullable<NonNullable<GetCustomerAddressesQuery['activeCustomer']>['addresses']>[number] | undefined>;
     availableCountries$: Observable<GetAvailableCountriesQuery['availableCountries']>;
-    availableProvinces$: Observable<GetAvailableProvincesQuery['availableProvinces']>;
+    countryId = '';
 
     @ViewChild('addressForm', { static: true }) private addressForm: AddressFormComponent;
 
-    constructor(private route: ActivatedRoute, private dataService: DataService) { }
+    constructor(
+        private route: ActivatedRoute,
+        private dataService: DataService,
+    ) { }
 
     ngOnInit() {
         this.address$ = this.route.paramMap.pipe(
@@ -46,19 +48,17 @@ export class AccountAddressDetailComponent implements OnInit {
                 ),
             ),
         );
+
+        this.address$.subscribe(
+            (address) => {
+                if (address && address.country) {
+                    this.countryId = address.country.id;
+                }
+            }
+        );
+
         this.availableCountries$ = this.dataService.query<GetAvailableCountriesQuery>(GET_AVAILABLE_COUNTRIES).pipe(
             map(data => data.availableCountries),
-        );
-        this.availableProvinces$ = this.dataService.query<GetAvailableProvincesQuery>(
-            GET_AVAILABLE_PROVINCES,
-            {
-                countryId: 209,
-                // countryId: this.contactForm.get('countryCode').value,
-            }
-        ).pipe(
-            map(
-                data => data.availableProvinces
-            ),
         );
 
     }
@@ -87,8 +87,8 @@ export class AccountAddressDetailComponent implements OnInit {
         this.dataService.mutate<UpdateAddressMutation, UpdateAddressMutationVariables>(UPDATE_ADDRESS, {
             input,
         }).subscribe(() => {
-            this.addressForm.addressForm.markAsPristine();
-        });
+                this.addressForm.addressForm.markAsPristine();
+            });
     }
 
 }

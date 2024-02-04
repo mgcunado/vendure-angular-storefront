@@ -2798,7 +2798,7 @@ export type Query = {
   activeOrder?: Maybe<Order>;
   /** An array of supported Countries */
   availableCountries: Array<Country>;
-  /** An array of supported Countries */
+  /** An array of supported Provinces by CountryId */
   availableProvinces: Array<Province>;
   /** Returns a Collection either by its id or slug. If neither 'id' nor 'slug' is specified, an error will result. */
   collection?: Maybe<Collection>;
@@ -2832,6 +2832,8 @@ export type Query = {
   product?: Maybe<Product>;
   /** Get a list of Products */
   products: ProductList;
+  /** Get an array by code */
+  provinceByCode: Province;
   /** Search Products based on the criteria set by the `SearchInput` */
   search: SearchResponse;
 };
@@ -2881,6 +2883,12 @@ export type QueryProductArgs = {
 
 export type QueryProductsArgs = {
   options?: InputMaybe<ProductListOptions>;
+};
+
+
+export type QueryProvinceByCodeArgs = {
+  code: Scalars['String'];
+  countryId: Scalars['ID'];
 };
 
 
@@ -3513,6 +3521,14 @@ export type GetAvailableProvincesQueryVariables = Exact<{
 
 
 export type GetAvailableProvincesQuery = { __typename?: 'Query', availableProvinces: Array<{ __typename?: 'Province', id: string, code: string, name: string, enabled: boolean }> };
+
+export type GetProvinceByCodeQueryVariables = Exact<{
+  countryId: Scalars['ID'];
+  code: Scalars['String'];
+}>;
+
+
+export type GetProvinceByCodeQuery = { __typename?: 'Query', provinceByCode: { __typename?: 'Province', id: string, code: string, name: string, enabled: boolean } };
 
 export type GetActiveCustomerQueryVariables = Exact<{ [key: string]: never; }>;
 
