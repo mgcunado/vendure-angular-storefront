@@ -4,6 +4,8 @@
         <li>{{ address.fullName }}</li>
         <li>{{ address.streetLine1 }}</li>
         <li>{{ address.city }}</li>
+         <!-- Next line is needed for shipping address -->
+        <li>{{ title !== 'My Addresses' ? address.province : '' }}</li>
         <li>{{ provinceName }}</li>
         <li>{{ address.postalCode }}</li>
         <li>{{ getCountryName() }}</li>

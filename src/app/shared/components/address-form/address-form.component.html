@@ -14,8 +14,12 @@
                     name="fullName"
                     formControlName="fullName"
                     autoComplete="given-name"
+                    required
                     class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 />
+            </div>
+            <div *ngIf="addressForm.get('fullName')?.hasError('required') && addressForm.get('fullName')?.touched"
+                class="text-purple-600">Full Name is required
             </div>
         </div>
 
@@ -52,9 +56,13 @@
                     id="streetLine1"
                     formControlName="streetLine1"
                     autoComplete="street-address"
+                    required
                     class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500
             sm:text-sm"
                 />
+            </div>
+            <div *ngIf="addressForm.get('streetLine1')?.hasError('required') && addressForm.get('streetLine1')?.touched"
+                class="text-purple-600">Address is required
             </div>
         </div>
 
@@ -91,9 +99,13 @@
                     id="city"
                     autoComplete="address-level2"
                     formControlName="city"
+                    required
                     class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500
             sm:text-sm"
                 />
+            </div>
+            <div *ngIf="addressForm.get('city')?.hasError('required') && addressForm.get('city')?.touched"
+                class="text-purple-600">City is required
             </div>
         </div>
 
@@ -106,12 +118,16 @@
             </label>
             <div class="mt-1">
                 <select
+                    required
                     class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                     formControlName="countryCode" id="countryCode">
                     <option *ngFor="let country of availableCountries" [ngValue]="country.code">
                         {{ country.name }}
                     </option>
                 </select>
+            </div>
+            <div *ngIf="addressForm.get('countryCode')?.hasError('required') && addressForm.get('countryCode')?.touched"
+                class="text-purple-600">Country is required
             </div>
         </div>
 
@@ -167,9 +183,13 @@
                     id="postalCode"
                     formControlName="postalCode"
                     autoComplete="postal-code"
+                    required
                     class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500
             sm:text-sm"
                 />
+            </div>
+            <div *ngIf="addressForm.get('postalCode')?.hasError('required') && addressForm.get('postalCode')?.touched"
+                class="text-purple-600">Postal code is required
             </div>
         </div>
 

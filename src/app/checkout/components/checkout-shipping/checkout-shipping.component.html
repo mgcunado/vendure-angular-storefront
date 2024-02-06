@@ -5,8 +5,8 @@
     <div class="" [ngClass]="step === 'selectAddress' ? 'block' : 'hidden'">
         <div class="d-flex flex-wrap">
             <div class="customer-address"
-                 *ngFor="let address of customerAddresses$ | async"
-                 (click)="setShippingAddress(address)">
+                *ngFor="let address of customerAddresses$ | async"
+                (click)="setShippingAddress(address)">
                 <div class="address-line" *ngFor="let line of getLines(address)">
                     {{ line }}
                 </div>
@@ -35,7 +35,7 @@
                     id="emailAddress"
                     name="emailAddress"
                     autoComplete="email"
-                   formControlName="emailAddress"
+                    formControlName="emailAddress"
                     class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                 />
             </div>
@@ -88,10 +88,10 @@
     </h2>
     <div class="card-body">
         <vsf-address-form #addressForm
-                          (focusout)="onAddressFormBlur(addressForm.addressForm)"
-                          [address]="customerAddress$ | async"
-                          [availableCountries]="availableCountries$ | async"
-                          [countryId]="countryId"
+            (focusout)="onAddressFormBlur(addressForm.addressForm)"
+            [address]="customerAddress$ | async"
+            [availableCountries]="availableCountries$ | async"
+            [countryId]="countryId"
         >
 
         </vsf-address-form>
@@ -118,9 +118,10 @@
         </div>
     </vsf-radio-card-fieldset>
 </div>
+<!-- to access to form by @ViewChild() we must use addressForm.addressForm -->
 <button class="btn-primary mt-6 w-full space-x-2"
-        [disabled]="!shippingMethodId || addressForm.invalid"
-        (click)="proceedToPayment()">
+    [disabled]="!shippingMethodId || addressForm.addressForm.invalid"
+    (click)="proceedToPayment()">
     <fa-icon icon="credit-card"></fa-icon>
     <span>Proceed to payment</span>
 </button>

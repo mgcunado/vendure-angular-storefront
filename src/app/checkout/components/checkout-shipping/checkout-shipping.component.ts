@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnIni
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
-import { first, map, mergeMap, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { first, map, mergeMap, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
 import {
     AddressFragment,
@@ -11,6 +11,7 @@ import {
     GetCustomerAddressesQuery,
     GetEligibleShippingMethodsQuery,
     GetOrderShippingDataQuery,
+    GetProvinceByCodeQuery,
     SetCustomerForOrderMutation,
     SetCustomerForOrderMutationVariables,
     SetShippingAddressMutation,
@@ -19,7 +20,7 @@ import {
     SetShippingMethodMutationVariables,
     TransitionToArrangingPaymentMutation
 } from '../../../common/generated-types';
-import { GET_AVAILABLE_COUNTRIES, GET_CUSTOMER_ADDRESSES } from '../../../common/graphql/documents.graphql';
+import { GET_AVAILABLE_COUNTRIES, GET_CUSTOMER_ADDRESSES, GET_PROVINCE_BY_CODE } from '../../../common/graphql/documents.graphql';
 import { notNullOrUndefined } from '../../../common/utils/not-null-or-undefined';
 import { DataService } from '../../../core/providers/data/data.service';
 import { ModalService } from '../../../core/providers/modal/modal.service';
@@ -59,6 +60,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     contactForm: UntypedFormGroup;
     private destroy$ = new Subject<void>();
     countryId = '';
+    provinceName: string;
 
     constructor(private dataService: DataService,
         private stateService: StateService,
@@ -161,8 +163,8 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
         }
     }
 
-    setShippingAddress(value: AddressFormValue | AddressFragment) {
-        const input = this.valueToAddressInput(value);
+    async setShippingAddress(value: AddressFormValue | AddressFragment) {
+        const input = await this.valueToAddressInput(value);
         this.dataService.mutate<SetShippingAddressMutation, SetShippingAddressMutationVariables>(SET_SHIPPING_ADDRESS, {
             input,
         }).subscribe(data => {
@@ -175,19 +177,21 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     }
 
     proceedToPayment() {
-        const shippingMethodId = this.shippingMethodId;
-        if (shippingMethodId) {
-            this.stateService.select(state => state.signedIn).pipe(
-                mergeMap(signedIn => !signedIn ? this.setCustomerForOrder() || of({}) : of({})),
-                mergeMap(() =>
-                    this.dataService.mutate<SetShippingMethodMutation, SetShippingMethodMutationVariables>(SET_SHIPPING_METHOD, {
-                        id: shippingMethodId,
-                    }),
-                ),
-                mergeMap(() => this.dataService.mutate<TransitionToArrangingPaymentMutation>(TRANSITION_TO_ARRANGING_PAYMENT)),
-            ).subscribe((data) => {
-                    this.router.navigate(['../payment'], {relativeTo: this.route});
-                });
+        if (this.addressForm.addressForm.valid) {
+            const shippingMethodId = this.shippingMethodId;
+            if (shippingMethodId) {
+                this.stateService.select(state => state.signedIn).pipe(
+                    mergeMap(signedIn => !signedIn ? this.setCustomerForOrder() || of({}) : of({})),
+                    mergeMap(() =>
+                        this.dataService.mutate<SetShippingMethodMutation, SetShippingMethodMutationVariables>(SET_SHIPPING_METHOD, {
+                            id: shippingMethodId,
+                        }),
+                    ),
+                    mergeMap(() => this.dataService.mutate<TransitionToArrangingPaymentMutation>(TRANSITION_TO_ARRANGING_PAYMENT)),
+                ).subscribe((data) => {
+                        this.router.navigate(['../payment'], {relativeTo: this.route});
+                    });
+            }
         }
     }
 
@@ -209,7 +213,10 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
         }
     }
 
-    private valueToAddressInput(value: AddressFormValue | AddressFragment): CreateAddressInput {
+    private async valueToAddressInput(value: AddressFormValue | AddressFragment): Promise<CreateAddressInput> {
+        if (value?.province){
+            await this.getProvinceByCode(value?.province);
+        }
         return {
             city: value.city || '',
             company: value.company || '',
@@ -219,7 +226,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             fullName: value.fullName || '',
             phoneNumber: value.phoneNumber || '',
             postalCode: value.postalCode || '',
-            province: value?.province2?.code || '',
+            province: value?.province ? this.provinceName : '',
             streetLine1: value.streetLine1 || '',
             streetLine2: value.streetLine2 || '',
         };
@@ -227,5 +234,17 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
 
     private isFormValue(input: AddressFormValue | AddressFragment): input is AddressFormValue {
         return typeof (input as any).countryCode === 'string';
+    }
+
+    async getProvinceByCode( code: string ) {
+        const data = await this.dataService.query<GetProvinceByCodeQuery>(
+            GET_PROVINCE_BY_CODE,
+            {
+                countryId: this.countryId,
+                code,
+            }
+        ).pipe(take(1)).toPromise();
+
+        this.provinceName = data?.provinceByCode?.name;
     }
 }

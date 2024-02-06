@@ -29,7 +29,7 @@ export class AddressFormComponent implements OnInit, OnChanges {
         private cdr: ChangeDetectorRef,
     ) {
         this.addressForm = this.formBuilder.group({
-            fullName: '',
+            fullName: ['', Validators.required],
             company: '',
             streetLine1: ['', Validators.required],
             streetLine2: '',

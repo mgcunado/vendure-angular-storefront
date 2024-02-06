@@ -98,11 +98,6 @@ export const ORDER_ADDRESS_FRAGMENT = gql`
         streetLine2
         city
         province
-        province2 {
-            id
-            code
-            name
-        }
         postalCode
         country
         phoneNumber
