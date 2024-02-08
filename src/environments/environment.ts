@@ -2,11 +2,15 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+
+export function getShopApiPath(languageCode: string): string {
+  return languageCode === 'es' ? 'shop-api?languageCode=es' : 'shop-api?languageCode=en';
+}
+
 export const environment = {
     production: false,
     apiHost: 'http://localhost',
     apiPort: 3000,
-    shopApiPath: 'shop-api',
     baseHref: '/',
     tokenMethod: 'bearer',
 };

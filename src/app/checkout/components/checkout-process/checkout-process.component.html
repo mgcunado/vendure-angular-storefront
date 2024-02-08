@@ -15,7 +15,7 @@
                                   class="w-48 block"
                                   title="Shipping address"
                                   [address]="cart.shippingAddress">
-                    <button class="border px-2 py-1 mt-2 rounded text-sm hover:bg-gray-100"
+                    <button class="btn-primary w-full border px-2 py-1 mt-2 rounded text-sm hover:bg-gray-600"
                             *ngIf="(activeStage$ | async) === 3"
                         (click)="changeShippingAddress()">Change
                     </button>

@@ -8,8 +8,9 @@ import { APOLLO_OPTIONS } from 'apollo-angular';
 import { HttpLink, Options } from 'apollo-angular/http';
 import { Request } from 'express';
 
-import { environment } from '../../environments/environment';
+import { environment, getShopApiPath } from '../../environments/environment';
 import possibleTypesResult from '../common/introspection-results';
+import { LanguageService } from './providers/language/language.service';
 
 const STATE_KEY = makeStateKey<any>('apollo.state');
 let apolloCache: InMemoryCache;
@@ -101,8 +102,17 @@ export function apolloOptionsFactory(
         },
     });
 
-    const {apiHost, apiPort, shopApiPath} = environment;
-    const uri = `${apiHost}:${apiPort}/${shopApiPath}`;
+    const {apiHost, apiPort} = environment;
+
+    // get the shopApiPath from the language selected on browser
+    // we'll use for that LanguageService, LanguageSwitcherComponent, getShopApiPath() function from environment.ts and LANGUAGE_KEY variable from localStorage
+    // We use a static method from LanguageService to get the selected language easyly inside this apollo function
+    function getUri(): string {
+        const shopApiPath = getShopApiPath(LanguageService.getSelectedLanguage());
+        return `${apiHost}:${apiPort}/${shopApiPath}`;
+    }
+
+    const uri = getUri();
     const options: Options = {
         uri,
         withCredentials: false,

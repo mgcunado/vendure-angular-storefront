@@ -29,6 +29,7 @@ import { ProductSearchBarComponent } from './components/product-search-bar/produ
 import { TopReviewsComponent } from './components/top-reviews/top-reviews.component';
 import { buildIconLibrary } from './icon-library';
 import { DefaultInterceptor } from './providers/data/interceptor';
+import { LanguageSwitcherComponent } from './components/language-switcher/language-switcher.component';
 
 const CORE_COMPONENTS = [
     ProductListComponent,
@@ -47,6 +48,7 @@ const CORE_COMPONENTS = [
     ProductListControlsComponent,
     ProductSearchBarComponent,
     AssetGalleryComponent,
+    LanguageSwitcherComponent,
 ];
 
 @NgModule({

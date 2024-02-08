@@ -1,0 +1,13 @@
+<div class="text-purple-300 text-xl">
+    <button (click)="changeLanguage('es')"
+        [class.active]="selectedLanguage === 'es'"
+        [disabled]="selectedLanguage === 'es'"
+    >es</button>
+    <span> {{ ' | ' }} </span>
+    <button (click)="changeLanguage('en')"
+        [class.active]="selectedLanguage === 'en'"
+        [disabled]="selectedLanguage === 'en'"
+    >en</button>
+</div>
+
+

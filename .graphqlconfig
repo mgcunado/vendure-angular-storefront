@@ -3,7 +3,7 @@
     "extensions": {
         "endpoints": {
             "demo": "https://demo.vendure.io/shop-api",
-            "dev": "http://localhost:3000/shop-api"
+            "dev": "http://localhost:3000/shop-api?languageCode=en"
         }
     }
 }
