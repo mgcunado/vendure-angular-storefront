@@ -9,6 +9,7 @@ import { routes } from './app.routes';
 import { HomePageComponent } from './core/components/home-page/home-page.component';
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
+import { AppTranslateModule } from './translate/translate.module';
 
 @NgModule({
     declarations: [
@@ -20,6 +21,7 @@ import { SharedModule } from './shared/shared.module';
         RouterModule.forRoot(routes, { scrollPositionRestoration: 'disabled', initialNavigation: 'enabledBlocking' }),
         CoreModule,
         SharedModule,
+        AppTranslateModule,
         // Using the service worker appears to break SSR after the initial page load.
         // ServiceWorkerModule.register(`${environment.baseHref}ngsw-worker.js`, {
         //     enabled: environment.production,
@@ -34,7 +36,9 @@ export class AppModule {
         private router: Router,
         private urlSerializer: UrlSerializer,
         @Inject(PLATFORM_ID) private platformId: any,
+        // private translate: TranslateService,
         @Inject(DOCUMENT) private document?: Document,
+
     ) {
         if (isPlatformBrowser(this.platformId)) {
             this.handleScrollOnNavigations();

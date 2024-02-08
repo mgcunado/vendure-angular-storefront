@@ -20,6 +20,7 @@ import { VerifyComponent } from './components/verify/verify.component';
 import { AccountGuard } from './providers/account.guard';
 import { SignInGuard } from './providers/sign-in.guard';
 import { AccountSignInComponent } from './components/account-sign-in/account-sign-in.component';
+import { AppTranslateModule } from '../translate/translate.module';
 
 const DECLARATIONS = [
     AccountDashboardComponent,
@@ -42,6 +43,7 @@ const DECLARATIONS = [
     declarations: DECLARATIONS,
     imports: [
         SharedModule,
+        AppTranslateModule,
         RouterModule.forChild(routes),
     ],
     providers: [

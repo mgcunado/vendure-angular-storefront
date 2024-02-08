@@ -1,6 +1,6 @@
 <div class="card" *ngIf="(signedIn$ | async) && (customerAddresses$ | async)?.length">
     <div class="card-header">
-        <button class="btn btn-light" (click)="step = 'selectAddress'">Select Address</button>
+        <button class="btn btn-light" (click)="step = 'selectAddress'">{{ 'Select Address' | translate }}</button>
     </div>
     <div class="" [ngClass]="step === 'selectAddress' ? 'block' : 'hidden'">
         <div class="d-flex flex-wrap">

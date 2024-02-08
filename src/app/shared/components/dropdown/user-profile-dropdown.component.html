@@ -13,27 +13,27 @@
     >
         <a routerLink="/account">
             <fa-icon icon="male" class="mr-2"></fa-icon>
-            Profile
+            {{ 'Profile' | translate }}
         </a>
         <a routerLink="/account/orders">
             <fa-icon icon="history" class="mr-2"></fa-icon>
-            Orders
+            {{ 'Orders' | translate }}
         </a>
         <a routerLink="/account/address-book">
             <fa-icon icon="address-book" class="mr-2"></fa-icon>
-            Adress Book
+            {{ 'Adress Book' | translate }}
         </a>
         <a routerLink="/account/details">
             <fa-icon icon="info" class="mr-2"></fa-icon>
-            Personal details
+            {{ 'Personal details' | translate }}
         </a>
         <a routerLink="/account/change-credentials">
             <fa-icon icon="edit" class="mr-2"></fa-icon>
-            Change credentials
+            {{ 'Change credentials' | translate }}
         </a>
         <a class="handPointer" (click)="logOut()">
             <fa-icon icon="sign-out" class="mr-2"></fa-icon>
-            Logout
+            {{ 'Logout' | translate }}
         </a>
     </div>
 </div>

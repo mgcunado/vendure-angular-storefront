@@ -11,7 +11,7 @@
         (click)="toggleAndFilters()"
     >
         <fa-icon [icon]="andFilters ? 'cut' : 'chain'" class="mr-2"></fa-icon>
-        {{ andFilters ? 'And Filters' : 'Or Filters' }}
+        {{ andFilters ? ('And Filters' | translate) : ('Or Filters' | translate) }}
     </button>
 </div>
 

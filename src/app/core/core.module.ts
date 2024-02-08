@@ -30,6 +30,7 @@ import { TopReviewsComponent } from './components/top-reviews/top-reviews.compon
 import { buildIconLibrary } from './icon-library';
 import { DefaultInterceptor } from './providers/data/interceptor';
 import { LanguageSwitcherComponent } from './components/language-switcher/language-switcher.component';
+import { AppTranslateModule } from '../translate/translate.module';
 
 const CORE_COMPONENTS = [
     ProductListComponent,
@@ -61,6 +62,7 @@ const CORE_COMPONENTS = [
         SharedModule,
         BrowserModule,
         ApolloModule,
+        AppTranslateModule,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: DefaultInterceptor, multi: true },

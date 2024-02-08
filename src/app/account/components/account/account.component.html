@@ -7,38 +7,38 @@
                    [routerLinkActiveOptions]="{ exact: true }"
                    routerLinkActive="bg-primary-50 border-primary-100 text-primary-600">
                     <fa-icon icon="male" class="mr-2"></fa-icon>
-                    Dashboard
+                    {{ 'Dashboard' | translate }}
                 </a>
                 <a class="text-gray-600 hover:bg-primary-50 hover:text-gray-900 border border-transparent flex items-center px-3 py-2 text-sm font-medium rounded-md"
                    [routerLink]="['./', 'orders']"
                    routerLinkActive="bg-primary-50 border-primary-100 text-primary-600">
                     <fa-icon icon="history" class="mr-2"></fa-icon>
-                    Orders
+                    {{ 'Orders' | translate }}
                 </a>
                 <a class="text-gray-600 hover:bg-primary-50 hover:text-gray-900 border border-transparent flex items-center px-3 py-2 text-sm font-medium rounded-md"
                    [routerLink]="['./', 'address-book']"
                    routerLinkActive="bg-primary-50 border-primary-100 text-primary-600">
                     <fa-icon icon="address-book" class="mr-2"></fa-icon>
-                    Address book
+                    {{ 'Address Book' | translate }}
                 </a>
                 <a class="text-gray-600 hover:bg-primary-50 hover:text-gray-900 border border-transparent flex items-center px-3 py-2 text-sm font-medium rounded-md"
                    [routerLink]="['./', 'details']"
                    routerLinkActive="bg-primary-50 border-primary-100 text-primary-600">
                     <fa-icon icon="info" class="mr-2"></fa-icon>
-                    Personal details
+                    {{ 'Personal details' | translate }}
                 </a>
                 <a class="text-gray-600 hover:bg-primary-50 hover:text-gray-900 border border-transparent flex items-center px-3 py-2 text-sm font-medium rounded-md"
                    [routerLink]="['./', 'change-credentials']"
                    routerLinkActive="bg-primary-50 border-primary-100 text-primary-600">
                     <fa-icon icon="edit" class="mr-2"></fa-icon>
-                    Change credentials
+                    {{ 'Change credentials' | translate }}
                 </a>
             </div>
 
             <div class="px-3 py-2 mt-12 border-t">
                 <button class="text-gray-700 hover:text-primary-600 text-sm" (click)="signOut()">
                     <fa-icon icon="sign-out" class="mr-2"></fa-icon>
-                    Sign out
+                    {{ 'Sign out' | translate }}
                 </button>
             </div>
         </div>

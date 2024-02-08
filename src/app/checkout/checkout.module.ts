@@ -10,6 +10,7 @@ import { CheckoutProcessComponent } from './components/checkout-process/checkout
 import { CheckoutShippingComponent } from './components/checkout-shipping/checkout-shipping.component';
 import { CheckoutSignInComponent } from './components/checkout-sign-in/checkout-sign-in.component';
 import { CheckoutStageIndicatorComponent } from './components/checkout-stage-indicator/checkout-stage-indicator.component';
+import { AppTranslateModule } from '../translate/translate.module';
 
 const DECLARATIONS = [
     CheckoutConfirmationComponent,
@@ -24,6 +25,8 @@ const DECLARATIONS = [
     declarations: DECLARATIONS,
     imports: [
         SharedModule,
+        AppTranslateModule,
+        AppTranslateModule,
         RouterModule.forChild(routes),
     ],
 })

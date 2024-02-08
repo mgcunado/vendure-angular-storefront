@@ -29,6 +29,7 @@ import { FormatPricePipe } from './pipes/format-price.pipe';
 import { ProductUrlPipe } from './pipes/product-url.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { UserProfileDropdownComponent } from './components/dropdown/user-profile-dropdown.component';
+import { AppTranslateModule } from '../translate/translate.module';
 
 const SHARED_DECLARATIONS = [
     CartContentsComponent,
@@ -63,6 +64,7 @@ const IMPORTS = [
     ReactiveFormsModule,
     OverlayModule,
     RouterModule,
+    AppTranslateModule,
 ];
 
 @NgModule({

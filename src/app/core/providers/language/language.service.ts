@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root'
 })
 export class LanguageService {
-    static LANGUAGE_KEY = '';
+    static LANGUAGE_KEY = 'selectedLanguageOnStorefront';
 
     setSelectedLanguage(language: string): void {
         localStorage.setItem(LanguageService.LANGUAGE_KEY, language);
