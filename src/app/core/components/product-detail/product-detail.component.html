@@ -29,7 +29,7 @@
                     htmlFor="option"
                     class="block text-sm font-medium text-gray-700"
                 >
-                    Select option
+                    {{ 'Select option' | translate }}
                 </label>
                 <select [(ngModel)]="selectedVariant"
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
@@ -52,10 +52,10 @@
                         }"
                         (click)="addToCart(selectedVariant, qty)"
                     >
-                        <div *ngIf="!product || !qtyInCart[selectedVariant.id]; else inCartCount">Add to cart</div>
+                        <div *ngIf="!product || !qtyInCart[selectedVariant.id]; else inCartCount">{{ 'Add to cart' | translate }}</div>
                         <ng-template #inCartCount>
                             <fa-icon icon="check" class="mr-2"></fa-icon>
-                            <span>{{ qtyInCart[selectedVariant.id] }} in cart</span>
+                            <span>{{ qtyInCart[selectedVariant.id] }} {{ 'in cart' | translate }}</span>
                         </ng-template>
                     </button>
 
@@ -75,22 +75,19 @@
             </div>
             <section class="mt-12 pt-12 border-t text-xs">
                 <h3 class="text-gray-600 font-bold mb-2">
-                    Shipping & Returns
+                    {{ 'Shipping & Returns' | translate }}
                 </h3>
                 <div class="text-gray-500 space-y-1">
                     <p>
-                        Standard shipping: 3 - 5 working days.
-                        Express shipping: 1 - 3 working days.
+                        {{ 'Standard shipping' | translate }}: 3 - 5 {{ 'working days' | translate }}.
+                        {{ 'Express shipping' | translate }}: 1 - 3 {{ 'working days' | translate }}.
                     </p>
                     <p>
-                        Shipping costs depend on delivery
-                        address and will be calculated during
-                        checkout.
+                        {{ 'Shipping costs depend on delivery address and will be calculated during checkout.' | translate }}
                     </p>
                     <p>
-                        Returns are subject to terms. Please see
-                        the <span class="underline">returns page</span>
-                        for further information.
+                        {{ 'Returns are subject to terms.' | translate }}
+                        {{ 'Please see the' | translate }} <span class="underline">{{ 'returns page' | translate }}</span> {{ 'for further information' | translate }}.
                     </p>
                 </div>
             </section>

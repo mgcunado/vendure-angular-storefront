@@ -18,6 +18,7 @@ export class AddressFormComponent implements OnInit, OnChanges {
     @Input() availableCountries: CountryFragment[];
     @Input() address: OrderAddressFragment | AddressFragment;
     @Input() countryId: string;
+    @Input() classToNewAdress?: boolean;
 
     addressForm: UntypedFormGroup;
     availableProvinces$: Observable<GetAvailableProvincesQuery['availableProvinces']>;
@@ -118,4 +119,12 @@ export class AddressFormComponent implements OnInit, OnChanges {
 
         this.availableProvinces = data.availableProvinces;
     }
+
+    // labelClasses = {
+    //     'block': true,
+    //     'text-sm': true,
+    //     'font-medium': true,
+    //     'text-gray-700': !this.classToNewAdress,
+    //     'text-gray-200': this.classToNewAdress
+    // };
 }

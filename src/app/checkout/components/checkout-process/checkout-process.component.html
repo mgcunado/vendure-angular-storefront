@@ -13,7 +13,7 @@
                 <vsf-cart-totals [cart]="cart"></vsf-cart-totals>
                 <vsf-address-card *ngIf="cart.shippingAddress?.streetLine1"
                                   class="w-48 block"
-                                  title="Shipping address"
+                                  title="Shipping Address"
                                   [address]="cart.shippingAddress">
                     <button class="btn-primary w-full border px-2 py-1 mt-2 rounded text-sm hover:bg-gray-600"
                             *ngIf="(activeStage$ | async) === 3"

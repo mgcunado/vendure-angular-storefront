@@ -44,7 +44,7 @@ export type AddressFormValue = Pick<AddressFragment, Exclude<keyof AddressFragme
 @Component({
     selector: 'vsf-checkout-shipping',
     templateUrl: './checkout-shipping.component.html',
-    // styleUrls: ['./checkout-shipping.component.scss'],
+    styleUrls: ['./checkout-shipping.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckoutShippingComponent implements OnInit, OnDestroy {
@@ -61,6 +61,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
     countryId = '';
     provinceName: string;
+    selectedAddressIndex = -1;
 
     constructor(private dataService: DataService,
         private stateService: StateService,
@@ -143,7 +144,8 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
                 title: 'Create new address',
             },
             closable: true,
-        }).pipe(
+        },
+        'createAddressOverlay').pipe(
                 switchMap(() => this.dataService.query<GetCustomerAddressesQuery>(GET_CUSTOMER_ADDRESSES, {}, 'network-only')),
             )
             .subscribe();
@@ -246,5 +248,9 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
         ).pipe(take(1)).toPromise();
 
         this.provinceName = data?.provinceByCode?.name;
+    }
+
+    setSelectedAddress(index: number) {
+        this.selectedAddressIndex = index;
     }
 }

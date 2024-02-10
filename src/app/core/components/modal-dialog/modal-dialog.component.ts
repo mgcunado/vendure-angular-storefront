@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, TemplateRef, Type } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Inject, TemplateRef, Type } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { Dialog, DIALOG_COMPONENT, MODAL_OPTIONS, ModalOptions } from '../../providers/modal/modal-types';
@@ -14,16 +14,21 @@ import { DialogButtonsDirective } from './dialog-buttons.directive';
     templateUrl: './modal-dialog.component.html',
     // styleUrls: ['./modal-dialog.component.scss'],
 })
-export class ModalDialogComponent<T extends Dialog<any>> {
+export class ModalDialogComponent<T extends Dialog<any>> implements AfterViewInit {
     closeModal: (result?: any) => void;
     titleTemplateRef$ = new Subject<TemplateRef<any>>();
     buttonsTemplateRef$ = new Subject<TemplateRef<any>>();
 
     constructor(
+        private cdr: ChangeDetectorRef,
         @Inject(DIALOG_COMPONENT) public childComponentType: Type<T>,
         @Inject(MODAL_OPTIONS) public options?: ModalOptions<T>,
     ) {}
 
+    ngAfterViewInit() {
+        // Acceso o modificación de la propiedad aquí
+        this.cdr.detectChanges();
+    }
     /**
      * This callback is invoked when the childComponentType is instantiated in the
      * template by the {@link DialogComponentOutletComponent}.

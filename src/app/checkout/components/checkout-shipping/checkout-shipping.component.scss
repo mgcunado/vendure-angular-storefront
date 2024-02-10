@@ -7,18 +7,21 @@
 
 .customer-address {
     display: inline-block;
-    font-size: $font-size-sm;
-    padding: $spacer;
-    margin-right: $spacer;
-    margin-bottom: $spacer;
-    border-radius: $border-radius;
-    cursor: pointer;
-    border: 1px solid $gray-200;
-    transition: background-color 0.2s;
-
-    &:hover {
-        background-color: $light;
-    }
+    // font-size: $font-size-sm;
+    // padding: $spacer;
+    // margin-right: $spacer;
+    // margin-bottom: $spacer;
+    // border-radius: 0.50rem;
+    // cursor: pointer;
+    // border: 1px solid $gray-200;
+    // transition: background-color 0.2s;
+    // color: black;
+    // background-color: $light;
+    //
+    // &:hover {
+    //     color: white;
+    //     background-color: $semi-light;
+    // }
 }
 
 .shipping-method {
@@ -27,4 +30,14 @@
     .price {
         margin-left: $spacer;
     }
+}
+
+.my-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 999;
 }

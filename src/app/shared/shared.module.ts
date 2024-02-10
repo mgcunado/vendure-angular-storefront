@@ -30,6 +30,7 @@ import { ProductUrlPipe } from './pipes/product-url.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { UserProfileDropdownComponent } from './components/dropdown/user-profile-dropdown.component';
 import { AppTranslateModule } from '../translate/translate.module';
+import { TranslateSentencePipe } from './pipes/translate-sentence.pipe';
 
 const SHARED_DECLARATIONS = [
     CartContentsComponent,
@@ -55,6 +56,7 @@ const SHARED_DECLARATIONS = [
     RadioCardFieldsetComponent,
     CartTotalsComponent,
     UserProfileDropdownComponent,
+    TranslateSentencePipe,
 ];
 
 const IMPORTS = [

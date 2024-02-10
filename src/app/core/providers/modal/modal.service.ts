@@ -58,6 +58,7 @@ export class ModalService {
     fromComponent<T extends Dialog<any>, R>(
         component: Type<T> & Type<Dialog<R>>,
         options?: ModalOptions<T>,
+        panelClass?: string,
     ): Observable<R | undefined> {
         const positionStrategy = this.overlay.position().global().centerHorizontally().centerVertically();
         const scrollStrategy = this.overlay.scrollStrategies.block();
@@ -65,6 +66,7 @@ export class ModalService {
             scrollStrategy,
             positionStrategy,
             hasBackdrop: true,
+            panelClass
         }));
 
         const portal = new ComponentPortal(ModalDialogComponent, null, this.createInjector(component, options));
