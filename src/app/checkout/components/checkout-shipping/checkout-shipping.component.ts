@@ -127,12 +127,24 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     }
 
     getLines(address: AddressFragment): string[] {
+        let provinceName: string | undefined;
+
+        if (address?.province && typeof address?.province === 'string') {
+            // We create an anonymous function and call it using () at the end
+            (async () => {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                await this.getProvinceByCode(address.province!, address.country?.id);
+            })();
+
+            provinceName = this?.provinceName;
+        }
+
         return [
             address.fullName,
             address.company,
             address.streetLine1,
             address.streetLine2,
-            address?.province2?.name,
+            provinceName,
             address.postalCode,
             address.country.name,
         ].filter(notNullOrUndefined);
@@ -145,7 +157,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             },
             closable: true,
         },
-        'createAddressOverlay').pipe(
+            'createAddressOverlay').pipe(
                 switchMap(() => this.dataService.query<GetCustomerAddressesQuery>(GET_CUSTOMER_ADDRESSES, {}, 'network-only')),
             )
             .subscribe();
@@ -238,11 +250,11 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
         return typeof (input as any).countryCode === 'string';
     }
 
-    async getProvinceByCode( code: string ) {
+    async getProvinceByCode( code: string, countryId?: string) {
         const data = await this.dataService.query<GetProvinceByCodeQuery>(
             GET_PROVINCE_BY_CODE,
             {
-                countryId: this.countryId,
+                countryId: countryId ? countryId : this.countryId,
                 code,
             }
         ).pipe(take(1)).toPromise();
