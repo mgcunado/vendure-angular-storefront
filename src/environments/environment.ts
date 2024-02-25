@@ -13,6 +13,7 @@ export const environment = {
     apiPort: 3000,
     baseHref: '/',
     tokenMethod: 'bearer',
+    stripePublishableKey: 'pk_test_51OkCXdHWMYTqMLlBf55HAsrNN8bgppJfuzaU92FkaA5qx5kshUlPbfaRusxx5My6bkAImNgTbf3s2jO6uOFZViH800lNlkYYHT',
 };
 
 /*

@@ -90,3 +90,9 @@ export const TRANSITION_TO_ARRANGING_PAYMENT = gql`
     ${CART_FRAGMENT}
     ${ERROR_RESULT_FRAGMENT}
 `;
+
+export const CREATE_STRIPE_PAYMENT_INTENT = gql`
+  mutation CreateStripePaymentIntent {
+    createStripePaymentIntent
+  }
+`;

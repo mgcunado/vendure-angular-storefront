@@ -1,4 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
+# my files and dirs to exclude
+/src/app/graphqlWrapper.ts
+/src/app/generated/
+/src/app/session-storage.service.ts
+/codegen-sdk.yml
+
 .angular
 
 # compiled output

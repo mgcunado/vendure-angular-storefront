@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { AddPaymentMutation, AddPaymentMutationVariables, GetEligiblePaymentMethodsQuery } from '../../../common/generated-types';
@@ -8,6 +8,7 @@ import { DataService } from '../../../core/providers/data/data.service';
 import { StateService } from '../../../core/providers/state/state.service';
 
 import { ADD_PAYMENT, GET_ELIGIBLE_PAYMENT_METHODS } from './checkout-payment.graphql';
+import { ActiveService } from 'src/app/core/providers/active/active.service';
 
 @Component({
     selector: 'vsf-checkout-payment',
@@ -19,17 +20,24 @@ export class CheckoutPaymentComponent implements OnInit {
     cardNumber: string;
     expMonth: number;
     expYear: number;
-    paymentMethods$: Observable<GetEligiblePaymentMethodsQuery['eligiblePaymentMethods']>
+    paymentMethods$: Observable<GetEligiblePaymentMethodsQuery['eligiblePaymentMethods']>;
     paymentErrorMessage: string | undefined;
+    activeOrderCode = '';
+    private activeOrderSubscription: Subscription;
 
     constructor(private dataService: DataService,
-                private stateService: StateService,
-                private router: Router,
-                private route: ActivatedRoute) { }
+        private stateService: StateService,
+        private router: Router,
+        private route: ActivatedRoute,
+        private activeService: ActiveService,
+    ) { }
 
     ngOnInit() {
         this.paymentMethods$ = this.dataService.query<GetEligiblePaymentMethodsQuery>(GET_ELIGIBLE_PAYMENT_METHODS)
             .pipe(map(res => res.eligiblePaymentMethods));
+        this.activeOrderSubscription = this.activeService.activeOrder$.subscribe(activeOrder => {
+            this.activeOrderCode = activeOrder?.code || '';
+        });
     }
 
     getMonths(): number[] {

@@ -23,5 +23,9 @@
       "esnext.asynciterable"
     ],
     "useDefineForClassFields": false
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/app/common/**/*.d.ts"
+  ]
 }

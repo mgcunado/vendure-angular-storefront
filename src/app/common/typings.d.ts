@@ -1,3 +1,5 @@
+declare const stripe: any;
+declare const elements: any;
 declare interface DriftOptions {
     namespace?: string;
     showWhitespaceAtEdges?: boolean;
@@ -35,3 +37,4 @@ declare class DriftZoom {
 declare module 'drift-zoom' {
     export = DriftZoom;
 }
+

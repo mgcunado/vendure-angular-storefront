@@ -1647,6 +1647,7 @@ export type Mutation = {
   authenticate: AuthenticationResult;
   /** Create a new Customer Address */
   createCustomerAddress: Address;
+  createStripePaymentIntent: Scalars['String'];
   /** Delete an existing Address */
   deleteCustomerAddress: Success;
   /** Authenticates the user using the native authentication strategy. This mutation is an alias for `authenticate({ native: { ... }})` */
@@ -2527,6 +2528,17 @@ export type PriceRange = {
   min: Scalars['Money'];
 };
 
+export type PriceRangeBucket = {
+  __typename?: 'PriceRangeBucket';
+  count: Scalars['Int'];
+  to: Scalars['Int'];
+};
+
+export type PriceRangeInput = {
+  max: Scalars['Int'];
+  min: Scalars['Int'];
+};
+
 export type Product = Node & {
   __typename?: 'Product';
   assets: Array<Asset>;
@@ -3004,6 +3016,8 @@ export type SearchInput = {
   facetValueFilters?: InputMaybe<Array<FacetValueFilterInput>>;
   groupByProduct?: InputMaybe<Scalars['Boolean']>;
   inStock?: InputMaybe<Scalars['Boolean']>;
+  priceRange?: InputMaybe<PriceRangeInput>;
+  priceRangeWithTax?: InputMaybe<PriceRangeInput>;
   skip?: InputMaybe<Scalars['Int']>;
   sort?: InputMaybe<SearchResultSortParameter>;
   take?: InputMaybe<Scalars['Int']>;
@@ -3020,7 +3034,16 @@ export type SearchResponse = {
   collections: Array<CollectionResult>;
   facetValues: Array<FacetValueResult>;
   items: Array<SearchResult>;
+  prices: SearchResponsePriceData;
   totalItems: Scalars['Int'];
+};
+
+export type SearchResponsePriceData = {
+  __typename?: 'SearchResponsePriceData';
+  buckets: Array<PriceRangeBucket>;
+  bucketsWithTax: Array<PriceRangeBucket>;
+  range: PriceRange;
+  rangeWithTax: PriceRange;
 };
 
 export type SearchResult = {
@@ -3031,7 +3054,7 @@ export type SearchResult = {
   description: Scalars['String'];
   facetIds: Array<Scalars['ID']>;
   facetValueIds: Array<Scalars['ID']>;
-  inStock: Scalars['Boolean'];
+  inStock?: Maybe<Scalars['Boolean']>;
   price: SearchResultPrice;
   priceWithTax: SearchResultPrice;
   productAsset?: Maybe<SearchResultAsset>;
@@ -3498,6 +3521,11 @@ export type TransitionToArrangingPaymentMutationVariables = Exact<{ [key: string
 
 
 export type TransitionToArrangingPaymentMutation = { __typename?: 'Mutation', transitionOrderToState?: { __typename?: 'Order', id: string, code: string, state: string, active: boolean, updatedAt: any, orderPlacedAt?: any, totalQuantity: number, subTotal: any, subTotalWithTax: any, total: any, totalWithTax: any, shipping: any, shippingWithTax: any, lines: Array<{ __typename?: 'OrderLine', id: string, unitPrice: any, unitPriceWithTax: any, quantity: number, linePriceWithTax: any, discountedLinePriceWithTax: any, featuredAsset?: { __typename?: 'Asset', id: string, width: number, height: number, name: string, preview: string, focalPoint?: { __typename?: 'Coordinate', x: number, y: number } }, productVariant: { __typename?: 'ProductVariant', id: string, name: string }, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> }>, shippingLines: Array<{ __typename?: 'ShippingLine', priceWithTax: any, shippingMethod: { __typename?: 'ShippingMethod', id: string, code: string, name: string, description: string } }>, discounts: Array<{ __typename?: 'Discount', amount: any, amountWithTax: any, description: string, adjustmentSource: string, type: AdjustmentType }> } | { __typename?: 'OrderStateTransitionError', errorCode: ErrorCode, message: string } };
+
+export type CreateStripePaymentIntentMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CreateStripePaymentIntentMutation = { __typename?: 'Mutation', createStripePaymentIntent: string };
 
 export type GetOrderForCheckoutQueryVariables = Exact<{ [key: string]: never; }>;
 
