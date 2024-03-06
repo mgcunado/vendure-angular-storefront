@@ -59,6 +59,7 @@ export class CheckoutPaymentComponent implements OnInit {
             .subscribe(async ({ addPaymentToOrder }) => {
                 switch (addPaymentToOrder?.__typename) {
                     case 'Order':
+                        // eslint-disable-next-line no-case-declarations
                         const order = addPaymentToOrder;
                         if (order && (order.state === 'PaymentSettled' || order.state === 'PaymentAuthorized')) {
                             await new Promise<void>(resolve => setTimeout(() => {

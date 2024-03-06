@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { StripeService } from 'ngx-stripe';
-import { StripeCardElement, StripeCardElementOptions, StripeElementsOptions } from '@stripe/stripe-js';
+// import { StripePaymentElementComponent } from 'ngx-stripe';
+import { PaymentIntentResult, StripeCardElementOptions, StripeElements, StripeElementsOptions, StripePaymentElementOptions, loadStripe } from '@stripe/stripe-js';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'vsf-checkout-form',
@@ -11,15 +12,40 @@ import { Observable } from 'rxjs';
     templateUrl: './checkout-form.component.html',
     // styleUrls: ['./checkout-form.component.css'],
     changeDetection: ChangeDetectionStrategy.Default,
+    imports: [
+        CommonModule,
+    ]
 })
 export class CheckoutFormComponent implements OnInit {
     @Input() orderCode: string;
     @Input() clientSecret$: Observable<string>;
+
     clientSecret = '';
 
+    @ViewChild('cardInfo') cardInfo: ElementRef = new ElementRef('');
+    cardError: string | null = null;
+
+    // @ViewChild(StripePaymentElementComponent, { static: false})
+    // paymentElement: StripePaymentElementComponent | undefined;
+    paying = false;
+    // paymentElementOptions: StripePaymentElementOptions = {
+    //     business: { name: "Boom's Black Market" },
+    //     defaultValues: {
+    //
+    //     }
+    // };
+    status = "";
+    paymentErrorMessage: string | undefined;
+
+    // paymentElementForm = this.fb.group({
+    //     name: ['', [Validators.required]],
+    //     email: ['', [Validators.email]]
+    // });
+
     stripe: any;
-    elements: any;
-    card: StripeCardElement;
+    elements: StripeElements;
+    card: any;
+    // card: StripeCardElement;
     cardOptions: StripeCardElementOptions = {
         style: {
             base: {
@@ -39,31 +65,34 @@ export class CheckoutFormComponent implements OnInit {
 
     constructor(
         private fb: FormBuilder,
-        private stripeService: StripeService,
-    ) {}
+        private ngZone: NgZone,
+    ) { }
 
     async ngOnInit() {
-        this.stripeService.setKey(environment.stripePublishableKey, { locale: 'es' });
-        this.stripe = this.stripeService.getInstance();
+        // this.stripeService.setKey(environment.stripePublishableKey, { locale: 'es' });
+        // this.stripe = this.stripeService.getInstance();
+        this.stripe = await loadStripe(environment.stripePublishableKey);
 
         this.clientSecret = await this.clientSecret$.toPromise();
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        this.elements = this.stripe!.elements({
+            clientSecret: this.clientSecret,
+        });
+
+        // Only mount the element the first time
+        if (!this.card) {
+            this.card = this.elements.create('card', this.cardOptions);
+            this.card.mount(this.cardInfo.nativeElement);
+            this.card.addEventListener('change', this.onChange.bind(this));
+        }
+
         this.stripeTest = this.fb.group({ name: ['', [Validators.required]] });
-
-        this.elementsOptions = { clientSecret: this.clientSecret };
-
-        this.stripeService.elements(this.elementsOptions)
-            .subscribe(elements => {
-                this.elements = elements;
-
-                // Only mount the element the first time
-                if (!this.card) {
-                    this.card = this.elements.create('card', this.cardOptions);
-                    this.card.mount('#card-element');
-                }
-            });
     }
 
+    onChange = ({ error }: { error: any }) => {
+        error ? this.ngZone.run(() => this.cardError = error.message) : this.ngZone.run(() => this.cardError = null);
+    };
 
     async handleSubmit(event: Event) {
         event.preventDefault();
@@ -72,36 +101,30 @@ export class CheckoutFormComponent implements OnInit {
             return;
         }
 
-        const { error } = await this.stripe.confirmPayment({
-            // Elements instance that was used to create the Payment Element
-            elements: this.elements,
+        const orderCode = this.orderCode;
+        const returnUrl = `${location.origin}/checkout/confirmation/${orderCode}`;
+
+        const result: PaymentIntentResult = await this.stripe.confirmPayment({
+            // Missing elements params here due next error: IntegrationError: Invalid value for stripe.confirmPayment(): elements should have a mounted Payment Element or Express Checkout Element. It looks like you have other Elements on the page.
+            // elements: this.elements,
+            clientSecret: this.clientSecret,
+            redirect: 'if_required',
             confirmParams: {
-                payment_method_data: {
-                    name: this.stripeTest.get('name')?.value,
-                    card: this.card,
-                },
-                return_url: window.location.origin + `/checkout/confirmation/${this.orderCode}`,
+                // When writing test code, use a PaymentMethod such as pm_card_visa instead of a card number.
+                payment_method: 'pm_card_visa',
             },
         });
 
-        if (error) {
-            console.log(error.message);
+
+        this.paying = false;
+        if (result.error) {
+            // Show error to the customer
+            console.log('error: ', result.error.message);
         } else {
-            // Your customer will be redirected to your `return_url`.
-            window.location.assign('/');
+            // The payment has been processed!
+            if (result.paymentIntent.status === 'succeeded') {
+                window.location.href = returnUrl;
+            }
         }
     }
-
-    // async createToken(event: Event) {
-    //     event.preventDefault();
-    //
-    //     const name = this.stripeTest.get('name')?.value;
-    //     this.stripeService.createToken(this.card, { name }).subscribe((result) => {
-    //     if (result.token) {
-    //     console.log('');
-    //     } else if (result.error) {
-    //     console.log(result.error.message);
-    //     }
-    //     });
-    // }
 }

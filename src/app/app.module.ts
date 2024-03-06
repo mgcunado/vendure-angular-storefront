@@ -10,8 +10,9 @@ import { HomePageComponent } from './core/components/home-page/home-page.compone
 import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { AppTranslateModule } from './translate/translate.module';
-import { NgxStripeModule } from 'ngx-stripe';
+// import { NgxStripeModule } from 'ngx-stripe';
 import { SessionStorageService } from './session-storage.service';
+// import { environment } from 'src/environments/environment';
 
 @NgModule({
     declarations: [
@@ -24,7 +25,7 @@ import { SessionStorageService } from './session-storage.service';
         CoreModule,
         SharedModule,
         AppTranslateModule,
-        NgxStripeModule.forRoot(),
+        // NgxStripeModule.forRoot(environment.stripePublishableKey),
         // Using the service worker appears to break SSR after the initial page load.
         // ServiceWorkerModule.register(`${environment.baseHref}ngsw-worker.js`, {
         //     enabled: environment.production,

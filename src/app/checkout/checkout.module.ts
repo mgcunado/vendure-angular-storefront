@@ -33,6 +33,7 @@ const DECLARATIONS = [
         ReactiveFormsModule,
         StripePaymentsComponent,
         CheckoutFormComponent,
+        ReactiveFormsModule,
         RouterModule.forChild(routes),
     ],
     schemas: [NO_ERRORS_SCHEMA],

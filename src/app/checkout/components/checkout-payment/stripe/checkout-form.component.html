@@ -1,6 +1,7 @@
 <form  class="credit-card">
-    <div id="card-element"></div>
+    <div #cardInfo></div>
 
+    <!-- <button (click)="createToken($event)" -->
     <button (click)="handleSubmit($event)"
         [disabled]="!stripe"
         class="flex w-full px-6 bg-primary-600 hover:bg-primary-700 items-center justify-center space-x-2 py-3 my-4 border border-transparent text-base font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
