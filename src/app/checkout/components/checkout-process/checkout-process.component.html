@@ -2,21 +2,36 @@
     <div class="lg:max-w-7xl max-w-2xl mx-auto pt-8 pb-24 px-4 sm:px-6 lg:px-8">
         <h2 class="sr-only">Checkout</h2>
         <vsf-checkout-stage-indicator [activeStage]="activeStage"
-                                      [signedIn]="signedIn$ | async"></vsf-checkout-stage-indicator>
+            [signedIn]="signedIn$ | async"></vsf-checkout-stage-indicator>
 
         <div class="lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16" [ngClass]="activeStage === 4 ? 'max-w-2xl mx-auto' : 'lg:grid lg:grid-cols-2'">
             <div class="main">
                 <router-outlet></router-outlet>
             </div>
             <div class="summary" *ngIf="cart$ | async as cart">
-                <vsf-cart-contents [cart]="cart" class="mb-3"></vsf-cart-contents>
+                <h3 class="text-lg font-medium text-white bg-gray-600 px-5 py-2">{{ 'Shopping Cart' | translate }}</h3>
+
+                <!-- when activeStage is shipping we add increment and decrement buttons -->
+                <ng-container *ngIf="(activeStage$ | async) === 2; else notShipping">
+                    <vsf-cart-contents [cart]="cart$ | async"
+                        [canAdjustQuantities]="true"
+                        (setQuantity)="setQuantity($event)"></vsf-cart-contents>
+                </ng-container>
+                <ng-template #notShipping>
+                    <vsf-cart-contents [cart]="cart$ | async"></vsf-cart-contents>
+                </ng-template>
+
+                <!-- create a decorative gray line -->
+                <hr class="grey-line-top">
                 <vsf-cart-totals [cart]="cart"></vsf-cart-totals>
+                <hr class="grey-line-bottom">
+
                 <vsf-address-card *ngIf="cart.shippingAddress?.streetLine1"
-                                  class="w-48 block"
-                                  title="Shipping Address"
-                                  [address]="cart.shippingAddress">
+                    class="w-48 block"
+                    title="Shipping Address"
+                    [address]="cart.shippingAddress">
                     <button class="btn-primary w-full border px-2 py-1 mt-2 rounded text-sm hover:bg-gray-600"
-                            *ngIf="(activeStage$ | async) === 3"
+                        *ngIf="(activeStage$ | async) === 3"
                         (click)="changeShippingAddress()">Change
                     </button>
                 </vsf-address-card>

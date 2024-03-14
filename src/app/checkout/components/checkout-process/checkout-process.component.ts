@@ -1,18 +1,20 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { filter, map, startWith, switchMap } from 'rxjs/operators';
+import { filter, map, startWith, switchMap, take } from 'rxjs/operators';
 
-import { GetOrderForCheckoutQuery, GetNextOrderStatesQuery, TransitionToAddingItemsMutation } from '../../../common/generated-types';
+import { GetOrderForCheckoutQuery, GetNextOrderStatesQuery, TransitionToAddingItemsMutation, AdjustItemQuantityMutation, AdjustItemQuantityMutationVariables, RemoveItemFromCartMutation, RemoveItemFromCartMutationVariables } from '../../../common/generated-types';
 import { DataService } from '../../../core/providers/data/data.service';
 import { StateService } from '../../../core/providers/state/state.service';
 
 import { GET_NEXT_ORDER_STATES, TRANSITION_TO_ADDING_ITEMS } from './checkout-process.graphql';
+import { ADJUST_ITEM_QUANTITY, REMOVE_ITEM_FROM_CART } from 'src/app/core/components/cart-drawer/cart-drawer.graphql';
+import { NotificationService } from 'src/app/core/providers/notification/notification.service';
 
 @Component({
     selector: 'vsf-checkout-process',
     templateUrl: './checkout-process.component.html',
-    // styleUrls: ['./checkout-process.component.scss'],
+    styleUrls: ['./checkout-process.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckoutProcessComponent implements OnInit {
@@ -24,7 +26,9 @@ export class CheckoutProcessComponent implements OnInit {
     constructor(private dataService: DataService,
                 private stateService: StateService,
                 private route: ActivatedRoute,
-                private router: Router) { }
+                private router: Router,
+                private notificationService: NotificationService,
+    ) { }
 
     ngOnInit() {
         this.signedIn$ = this.stateService.select(state => state.signedIn);
@@ -60,4 +64,39 @@ export class CheckoutProcessComponent implements OnInit {
         });
     }
 
+    setQuantity(event: { itemId: string; quantity: number; }) {
+        if (0 < event.quantity) {
+            this.adjustItemQuantity(event.itemId, event.quantity);
+        } else {
+            this.removeItem(event.itemId);
+        }
+    }
+
+    private adjustItemQuantity(id: string, qty: number) {
+        this.dataService.mutate<AdjustItemQuantityMutation, AdjustItemQuantityMutationVariables>(ADJUST_ITEM_QUANTITY, {
+            id,
+            qty,
+        }).pipe(
+            take(1),
+        ).subscribe(({ adjustOrderLine }) => {
+            switch (adjustOrderLine.__typename) {
+                case 'Order':
+                    break;
+                case 'InsufficientStockError':
+                case 'NegativeQuantityError':
+                case 'OrderLimitError':
+                case 'OrderModificationError':
+                    this.notificationService.error(adjustOrderLine.message).subscribe();
+                    break;
+            }
+        });
+    }
+
+    private removeItem(id: string) {
+        this.dataService.mutate<RemoveItemFromCartMutation, RemoveItemFromCartMutationVariables>(REMOVE_ITEM_FROM_CART, {
+            id,
+        }).pipe(
+            take(1),
+        ).subscribe();
+    }
 }

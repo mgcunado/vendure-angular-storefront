@@ -5,7 +5,7 @@ import { map, shareReplay, switchMap, take } from 'rxjs/operators';
 import {
     AdjustItemQuantityMutation, AdjustItemQuantityMutationVariables,
     GetActiveOrderQuery,
-    GetActiveOrderQueryVariables,
+    GetOrderForCheckoutQuery,
     RemoveItemFromCartMutation, RemoveItemFromCartMutationVariables
 } from '../../../common/generated-types';
 import { DataService } from '../../providers/data/data.service';
@@ -14,6 +14,7 @@ import { StateService } from '../../providers/state/state.service';
 
 import { ADJUST_ITEM_QUANTITY, REMOVE_ITEM_FROM_CART } from './cart-drawer.graphql';
 import { ActiveService } from '../../providers/active/active.service';
+import { GET_ORDER_FOR_CHECKOUT } from 'src/app/checkout/providers/checkout-resolver.graphql';
 
 @Component({
     selector: 'vsf-cart-drawer',
@@ -26,6 +27,8 @@ export class CartDrawerComponent implements OnInit {
     // eslint-disable-next-line @angular-eslint/no-output-native
     @Output() close = new EventEmitter<void>();
     @ViewChild('overlay') private overlayRef: ElementRef<HTMLDivElement>;
+
+    orderState$: Observable<string>;
 
     // added by me to close cart popup window on Escape key
     @HostListener('document:keydown', ['$event'])
@@ -53,6 +56,10 @@ export class CartDrawerComponent implements OnInit {
         );
         this.isEmpty$ = this.cart$.pipe(
             map(cart => !cart || cart.lines.length === 0),
+        );
+
+        this.orderState$ = this.dataService.query<GetOrderForCheckoutQuery>(GET_ORDER_FOR_CHECKOUT, undefined, 'cache-first').pipe(
+            map(data => data.activeOrder ? data.activeOrder.state : 'AddingItems'),
         );
     }
 

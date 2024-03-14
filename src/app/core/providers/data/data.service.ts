@@ -10,13 +10,13 @@ import { filter, map } from 'rxjs/operators';
 })
 export class DataService {
 
-    private readonly context =  {
+    private readonly context = {
         headers: {},
     };
 
     constructor(private apollo: Apollo) { }
 
-    query<T = any, V extends Record<string, any> = {}>(query: DocumentNode, variables?: V, fetchPolicy?: WatchQueryFetchPolicy): Observable<T> {
+    query<T = any, V extends Record<string, any> = object>(query: DocumentNode, variables?: V, fetchPolicy?: WatchQueryFetchPolicy): Observable<T> {
         return this.apollo.watchQuery<T, V>({
             query,
             variables,

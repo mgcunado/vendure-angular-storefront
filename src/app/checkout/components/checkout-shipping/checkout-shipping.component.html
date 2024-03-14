@@ -1,11 +1,14 @@
 <div class="card" *ngIf="(signedIn$ | async) && (customerAddresses$ | async)?.length">
     <div class="card-header">
-<button class="btn btn-light bg-[#0088CC] hover:bg-[#006699] text-white py-2 px-4 rounded-lg" (click)="step = 'selectAddress'">
-            {{ 'Select Address' | translate }}
-        </button>
+        <!-- <button class="btn btn-light bg-[#0088CC] hover:bg-[#006699] text-white py-2 px-4 rounded-lg" (click)="step = 'selectAddress'"> -->
+        <!--     {{ 'Select Shipping Address' | translate }} -->
+        <!-- </button> -->
+        <h2 class="text-lg font-medium text-gray-900">
+            {{ 'Shipping Address' | translate }}
+        </h2>
     </div>
-    <div class="" [ngClass]="step === 'selectAddress' ? 'block' : 'hidden'">
-        <!-- <div class="d-flex flex-wrap"> -->
+    <!-- <div class="" [ngClass]="step === 'selectAddress' ? 'block' : 'hidden'"> -->
+    <div class="" [ngClass]="block">
         <div class="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
             <div
                 [ngClass]="{
@@ -35,7 +38,6 @@
                         clip-rule="evenodd"
                     />
                 </svg>
-
             </div>
             <div class="d-flex align-items-end ml-3 mb-3">
                 <button class="btn btn-light bg-[#CC8800] hover:bg-[#996600] text-white py-2 px-4 rounded-lg" (click)="createAddress()">{{ 'Add new address' | translate }}</button>
@@ -108,21 +110,21 @@
     </form>
 </div>
 
-<div class="mt-10 border-t border-gray-200 pt-10">
-    <h2 class="text-lg font-medium text-gray-900">
-        {{ 'Shipping Address' | translate }}
-    </h2>
-    <div class="card-body">
-        <vsf-address-form #addressForm
-            (focusout)="onAddressFormBlur(addressForm.addressForm)"
-            [address]="customerAddress$ | async"
-            [availableCountries]="availableCountries$ | async"
-            [countryId]="countryId"
-        >
-
-        </vsf-address-form>
-    </div>
-</div>
+<!-- <div class="mt-10 border-t border-gray-200 pt-10"> -->
+<!--     <h2 class="text-lg font-medium text-gray-900"> -->
+<!--         {{ 'Shipping Address' | translate }} -->
+<!--     </h2> -->
+<!--     <div class="card-body"> -->
+<!--         <vsf-address-form #addressForm -->
+<!--             (focusout)="onAddressFormBlur(addressForm.addressForm)" -->
+<!--             [address]="customerAddress$ | async" -->
+<!--             [availableCountries]="availableCountries$ | async" -->
+<!--             [countryId]="countryId" -->
+<!--         > -->
+<!---->
+<!--         </vsf-address-form> -->
+<!--     </div> -->
+<!-- </div> -->
 <div class="mt-10 border-t border-gray-200 pt-10">
     <h2 class="text-lg font-medium text-gray-900">
         {{ 'Shipping Method' | translate }}
@@ -146,8 +148,9 @@
 </div>
 <!-- to access to form by @ViewChild() we must use addressForm.addressForm -->
 <button class="btn-primary mt-6 w-full space-x-2"
-    [disabled]="!shippingMethodId || addressForm.addressForm.invalid"
+    [disabled]="!shippingMethodId || selectedAddressIndex < 0"
     (click)="proceedToPayment()">
     <fa-icon icon="credit-card"></fa-icon>
     <span>{{ 'Proceed to payment' | translate }}</span>
 </button>
+<!-- [disabled]="!shippingMethodId || addressForm.addressForm.invalid" -->

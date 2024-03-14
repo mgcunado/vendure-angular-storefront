@@ -26,7 +26,6 @@ import { DataService } from '../../../core/providers/data/data.service';
 import { ModalService } from '../../../core/providers/modal/modal.service';
 import { NotificationService } from '../../../core/providers/notification/notification.service';
 import { StateService } from '../../../core/providers/state/state.service';
-import { AddressFormComponent } from '../../../shared/components/address-form/address-form.component';
 import { AddressModalComponent } from '../../../shared/components/address-modal/address-modal.component';
 
 import {
@@ -48,7 +47,7 @@ export type AddressFormValue = Pick<AddressFragment, Exclude<keyof AddressFragme
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckoutShippingComponent implements OnInit, OnDestroy {
-    @ViewChild('addressForm') addressForm: AddressFormComponent;
+    // @ViewChild('addressForm') addressForm: AddressFormComponent;
 
     customerAddresses$: Observable<AddressFragment[]>;
     customerAddress$: Observable<AddressFragment>;
@@ -163,19 +162,19 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             .subscribe();
     }
 
-    editAddress(address: AddressFragment) {
-        this.addressForm.addressForm.patchValue({...address, countryCode: address.country.code});
-    }
+    // editAddress(address: AddressFragment) {
+    //     this.addressForm.addressForm.patchValue({...address, countryCode: address.country.code});
+    // }
 
     onCustomerFormBlur() {
         this.setCustomerForOrder()?.subscribe();
     }
 
-    onAddressFormBlur(addressForm: UntypedFormGroup) {
-        if (addressForm.dirty && addressForm.valid) {
-            this.setShippingAddress(addressForm.value);
-        }
-    }
+    // onAddressFormBlur(addressForm: UntypedFormGroup) {
+    //     if (addressForm.dirty && addressForm.valid) {
+    //         this.setShippingAddress(addressForm.value);
+    //     }
+    // }
 
     async setShippingAddress(value: AddressFormValue | AddressFragment) {
         const input = await this.valueToAddressInput(value);
@@ -191,7 +190,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     }
 
     proceedToPayment() {
-        if (this.addressForm.addressForm.valid) {
+        // if (this.addressForm.addressForm.valid) {
             const shippingMethodId = this.shippingMethodId;
             if (shippingMethodId) {
                 this.stateService.select(state => state.signedIn).pipe(
@@ -206,7 +205,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
                         this.router.navigate(['../payment'], {relativeTo: this.route});
                     });
             }
-        }
+        // }
     }
 
     getId(method: { id: string }) {

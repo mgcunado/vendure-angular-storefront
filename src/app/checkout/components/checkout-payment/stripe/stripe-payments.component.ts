@@ -16,7 +16,13 @@ import { map } from 'rxjs/operators';
 @Component({
     selector: 'vsf-stripe-payments',
     standalone: true,
-    imports: [CommonModule, StripeCardComponent, NgxStripeModule, FormsModule, CheckoutFormComponent],
+    imports: [
+        CommonModule,
+        StripeCardComponent,
+        NgxStripeModule,
+        FormsModule,
+        CheckoutFormComponent,
+    ],
     templateUrl: './stripe-payments.component.html',
     // styleUrls: ['./stripe-payment.component.scss']
 })

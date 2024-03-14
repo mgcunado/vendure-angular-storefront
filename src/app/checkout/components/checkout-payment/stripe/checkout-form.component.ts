@@ -1,19 +1,29 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, NgZone, OnInit, ViewChild } from '@angular/core';
 import { environment } from 'src/environments/environment';
-// import { StripePaymentElementComponent } from 'ngx-stripe';
-import { PaymentIntentResult, StripeCardElementOptions, StripeElements, StripeElementsOptions, StripePaymentElementOptions, loadStripe } from '@stripe/stripe-js';
+import { PaymentIntentResult, StripeCardElementOptions, StripeElements, StripeElementsOptions, loadStripe } from '@stripe/stripe-js';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { SharedModule } from 'src/app/shared/shared.module';
+
+interface StripeCardEvent {
+    elementType: string;
+    error?: any;
+    value?: any;
+    empty?: boolean;
+    complete?: boolean;
+}
 
 @Component({
     selector: 'vsf-checkout-form',
     standalone: true,
     templateUrl: './checkout-form.component.html',
-    // styleUrls: ['./checkout-form.component.css'],
+    styleUrls: ['./checkout-form.component.scss'],
+    // styleUrls: ['../../../../../../src/styles/styles.scss'],
     changeDetection: ChangeDetectionStrategy.Default,
     imports: [
         CommonModule,
+        SharedModule,
     ]
 })
 export class CheckoutFormComponent implements OnInit {
@@ -22,42 +32,45 @@ export class CheckoutFormComponent implements OnInit {
 
     clientSecret = '';
 
+    // @ViewChild('cardInfo') cardInfo: ElementRef = new ElementRef('');
     @ViewChild('cardInfo') cardInfo: ElementRef = new ElementRef('');
+    @ViewChild('exp') exp: ElementRef = new ElementRef('');
+    @ViewChild('cvc') cvc: ElementRef = new ElementRef('');
     cardError: string | null = null;
 
-    // @ViewChild(StripePaymentElementComponent, { static: false})
-    // paymentElement: StripePaymentElementComponent | undefined;
     paying = false;
-    // paymentElementOptions: StripePaymentElementOptions = {
-    //     business: { name: "Boom's Black Market" },
-    //     defaultValues: {
-    //
-    //     }
-    // };
     status = "";
     paymentErrorMessage: string | undefined;
-
-    // paymentElementForm = this.fb.group({
-    //     name: ['', [Validators.required]],
-    //     email: ['', [Validators.email]]
-    // });
 
     stripe: any;
     elements: StripeElements;
     card: any;
-    // card: StripeCardElement;
+    cardNumber: any;
+    cardCvc: any;
+    cardExp: any;
+
+    cardNumberComplete = false;
+    cardExpiryComplete = false;
+    cardCvcComplete = false;
+
     cardOptions: StripeCardElementOptions = {
+        // classes: {
+        // base: 'border-gray-300',
+        // },
         style: {
             base: {
                 iconColor: '#666EE8',
                 color: '#31325F',
-                fontWeight: '300',
+                fontWeight: '100',
                 fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-                fontSize: '18px',
+                fontSize: '16px',
                 '::placeholder': {
-                    color: '#CFD7E0'
-                }
-            }
+                    color: '#B5B5B5',
+                },
+            },
+            invalid: {
+                color: '#dc3545',
+            },
         }
     };
     stripeTest: FormGroup;
@@ -66,7 +79,8 @@ export class CheckoutFormComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private ngZone: NgZone,
-    ) { }
+        private cdr: ChangeDetectorRef,
+    ) {}
 
     async ngOnInit() {
         // this.stripeService.setKey(environment.stripePublishableKey, { locale: 'es' });
@@ -82,15 +96,32 @@ export class CheckoutFormComponent implements OnInit {
 
         // Only mount the element the first time
         if (!this.card) {
-            this.card = this.elements.create('card', this.cardOptions);
-            this.card.mount(this.cardInfo.nativeElement);
-            this.card.addEventListener('change', this.onChange.bind(this));
+            this.cardNumber = this.elements.create('cardNumber', this.cardOptions);
+            this.cardCvc = this.elements.create('cardCvc', this.cardOptions);
+            this.cardExp = this.elements.create('cardExpiry', this.cardOptions);
+            this.cardNumber.mount(this.cardInfo.nativeElement);
+            this.cardNumber.addEventListener('change', (event: StripeCardEvent) => this.onChange(event));
+
+            this.cardExp.mount(this.exp.nativeElement);
+            this.cardExp.addEventListener('change', (event: StripeCardEvent) => this.onChange(event));
+
+            this.cardCvc.mount(this.cvc.nativeElement);
+            this.cardCvc.addEventListener('change', (event: StripeCardEvent) => this.onChange(event));
+
         }
 
         this.stripeTest = this.fb.group({ name: ['', [Validators.required]] });
     }
 
-    onChange = ({ error }: { error: any }) => {
+    onChange = (event: StripeCardEvent) => {
+        const { elementType, complete, error } = event;
+
+        if ( elementType === 'cardNumber' && complete) this.cardNumberComplete = true;
+        if ( elementType === 'cardExpiry' && complete) this.cardExpiryComplete = true;
+        if ( elementType === 'cardCvc' && complete) this.cardCvcComplete = true;
+
+        this.cdr.detectChanges();
+
         error ? this.ngZone.run(() => this.cardError = error.message) : this.ngZone.run(() => this.cardError = null);
     };
 
@@ -114,7 +145,6 @@ export class CheckoutFormComponent implements OnInit {
                 payment_method: 'pm_card_visa',
             },
         });
-
 
         this.paying = false;
         if (result.error) {
