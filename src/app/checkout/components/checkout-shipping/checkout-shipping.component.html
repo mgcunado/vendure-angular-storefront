@@ -135,7 +135,10 @@
         (selectItem)="setShippingMethod($event.id)"
     >
         <div class="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
-            <vsf-radio-card *ngFor="let method of eligibleShippingMethods$ | async" [item]="method">
+            <vsf-radio-card *ngFor="let method of eligibleShippingMethods$ | async"
+                [item]="method"
+                (shippingMethodSelected)="onShippingMethodSelected($event)"
+            >
                 <span class="block text-sm font-medium text-gray-900">
                     {{ method.name }}
                 </span>

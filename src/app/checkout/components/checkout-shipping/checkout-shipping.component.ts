@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
-import { first, map, mergeMap, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { filter, first, map, mergeMap, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
 import {
     AddressFragment,
@@ -61,6 +61,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     countryId = '';
     provinceName: string;
     selectedAddressIndex = -1;
+    localStorageSelectedAddress = localStorage.getItem('selectedAddress');
 
     constructor(private dataService: DataService,
         private stateService: StateService,
@@ -73,6 +74,13 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     }
 
     async ngOnInit() {
+        if (localStorage.getItem('selectedAddress')) {
+            this.selectedAddressIndex = Number(localStorage.getItem('selectedAddress'));
+        } else {
+            this.selectedAddressIndex = 0;
+        }
+        this.setSelectedAddress(this.selectedAddressIndex);
+
         this.contactForm = this.formBuilder.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
@@ -83,8 +91,22 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
             map(data => data.activeCustomer ? data.activeCustomer.addresses || [] : []),
         );
         this.customerAddress$ = this.customerAddresses$.pipe(
+            // Verify if the array is not empty
+            filter(addresses => addresses.length > 0),
+            // Exec the setSelectedAddress(0)
+            tap(async (addresses) => {
+                if (!localStorage.getItem('selectedAddress')) {
+                    this.countryId = addresses[0].country.id;
+                    await this.setShippingAddress(addresses[0]);
+                } else (
+                    this.countryId = addresses[Number(this.localStorageSelectedAddress)].country.id,
+                    await this.setShippingAddress(addresses[Number(this.localStorageSelectedAddress)])
+                    // localStorage.removeItem('selectedAddress')
+                );
+            }),
             // Extract the first element from the array
             map(addresses => addresses[0]),
+            // Emit the first element
             first()
         );
         this.customerAddress$.subscribe((address: AddressFragment) => {
@@ -163,7 +185,7 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     }
 
     // editAddress(address: AddressFragment) {
-    //     this.addressForm.addressForm.patchValue({...address, countryCode: address.country.code});
+    // this.addressForm.addressForm.patchValue({...address, countryCode: address.country.code});
     // }
 
     onCustomerFormBlur() {
@@ -171,9 +193,9 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
     }
 
     // onAddressFormBlur(addressForm: UntypedFormGroup) {
-    //     if (addressForm.dirty && addressForm.valid) {
-    //         this.setShippingAddress(addressForm.value);
-    //     }
+    // if (addressForm.dirty && addressForm.valid) {
+    // this.setShippingAddress(addressForm.value);
+    // }
     // }
 
     async setShippingAddress(value: AddressFormValue | AddressFragment) {
@@ -191,20 +213,26 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
 
     proceedToPayment() {
         // if (this.addressForm.addressForm.valid) {
-            const shippingMethodId = this.shippingMethodId;
-            if (shippingMethodId) {
-                this.stateService.select(state => state.signedIn).pipe(
-                    mergeMap(signedIn => !signedIn ? this.setCustomerForOrder() || of({}) : of({})),
-                    mergeMap(() =>
-                        this.dataService.mutate<SetShippingMethodMutation, SetShippingMethodMutationVariables>(SET_SHIPPING_METHOD, {
-                            id: shippingMethodId,
-                        }),
-                    ),
-                    mergeMap(() => this.dataService.mutate<TransitionToArrangingPaymentMutation>(TRANSITION_TO_ARRANGING_PAYMENT)),
-                ).subscribe((data) => {
-                        this.router.navigate(['../payment'], {relativeTo: this.route});
-                    });
-            }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const shippingMethodId = this.shippingMethodId!;
+        localStorage.setItem('selectedShippingMethod', shippingMethodId);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const selectedAddressIndex = this.selectedAddressIndex!;
+        localStorage.setItem('selectedAddress', String(selectedAddressIndex));
+
+        if (shippingMethodId) {
+            this.stateService.select(state => state.signedIn).pipe(
+                mergeMap(signedIn => !signedIn ? this.setCustomerForOrder() || of({}) : of({})),
+                mergeMap(() =>
+                    this.dataService.mutate<SetShippingMethodMutation, SetShippingMethodMutationVariables>(SET_SHIPPING_METHOD, {
+                        id: shippingMethodId,
+                    }),
+                ),
+                mergeMap(() => this.dataService.mutate<TransitionToArrangingPaymentMutation>(TRANSITION_TO_ARRANGING_PAYMENT)),
+            ).subscribe((data) => {
+                    this.router.navigate(['../payment'], {relativeTo: this.route});
+                });
+        }
         // }
     }
 
@@ -263,5 +291,9 @@ export class CheckoutShippingComponent implements OnInit, OnDestroy {
 
     setSelectedAddress(index: number) {
         this.selectedAddressIndex = index;
+    }
+
+    onShippingMethodSelected(shippingMethodId: string) {
+        this.shippingMethodId = shippingMethodId;
     }
 }

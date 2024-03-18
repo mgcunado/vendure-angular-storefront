@@ -2,7 +2,7 @@
     <div class="modal-header">
         <h5 class="modal-title"><ng-container *ngTemplateOutlet="(titleTemplateRef$ | async)"></ng-container></h5>
         <button *ngIf="options?.closable" type="button"
-                (click)="closeModal()"
+                (click)="closeModa()"
                 class="close"
                 data-dismiss="modal"
                 aria-label="Close">

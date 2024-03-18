@@ -4,9 +4,9 @@
 
 <ng-container *ngFor="let paymentMethod of paymentMethods$ | async">
     <ng-container *ngIf="!paymentMethod.code.includes('stripe')">
-        <h4 class="font-medium">Pay with method "{{ paymentMethod.code }}"</h4>
+        <h4 class="text-lg font-medium text-white bg-blue-500 px-5 py-2 border-gray-300 rounded-md">{{ ['Pay with', paymentMethod.code] | translateSentence }}</h4>
         <div class="alert alert-info my-4" role="alert">
-            This is an example payment form. Do not use real card details!
+            {{ 'This is an example payment form. Do not use real card details!' | translate }}
         </div>
         <form class="border bg-white rounded p-4 max-w-sm" #paymentForm="ngForm" (submit)="completeOrder(paymentMethod.code)">
             <div class="flex items-center space-x-2">
@@ -22,7 +22,7 @@
             </div>
 
             <div class="flex items-center mt-4 space-x-2">
-                <label class="w-16 text-gray-600" for="month">Expiry</label>
+                <label class="w-16 text-gray-600 mr-2" for="month">{{ 'Expiry' | translate }}</label>
                 <select
                     class="block flex-1 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
                     id="month" name="expMonth" [(ngModel)]="expMonth" [required]="true">
@@ -48,7 +48,8 @@
     </ng-container>
 
     <ng-container *ngIf="paymentMethod.code.includes('stripe')">
-        <h4 class="font-medium">Pay with method "{{ paymentMethod.code }}"</h4>
+        <!-- <h4 class="font-medium">{{ ['Pay with', paymentMethod.code] | translateSentence }}</h4> -->
+        <h4 class="text-lg font-medium text-white bg-blue-500 px-5 py-2 border-gray-300 rounded-md mt-9">{{ ['Pay with', paymentMethod.code] | translateSentence }}</h4>
         <vsf-stripe-payments
             [orderCode]="activeOrderCode"
         ></vsf-stripe-payments>

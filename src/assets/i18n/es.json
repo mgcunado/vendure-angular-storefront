@@ -52,5 +52,11 @@
   "Payment": "Pagar",
   "Complete": "Finalizar",
   "Create new adress": "Crear nueva dirección",
-  "Search...": "Buscar..."
+  "Search...": "Buscar...",
+  "Go back": "Volver atrás",
+  "Create new address": "Crear nueva dirección",
+  "This is an example payment form. Do not use real card details!": "Este es un formulario de pago de ejemplo. No utilice detalles de tarjeta reales!",
+  "Pay with": "Pagar con",
+  "standard-payment": "pago-estandar",
+  "Expiry": "Caducidad"
 }

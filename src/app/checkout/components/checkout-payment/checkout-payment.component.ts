@@ -78,5 +78,7 @@ export class CheckoutPaymentComponent implements OnInit {
                 }
 
             });
+
+        localStorage.removeItem('selectedAddress');
     }
 }

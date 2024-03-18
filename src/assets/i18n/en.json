@@ -52,5 +52,11 @@
   "Payment": "Payment",
   "Complete": "Completed",
   "Create new adress": "Create new adress",
-  "Search...": "Search..."
+  "Search...": "Search...",
+  "Go back": "Go back",
+  "Create new address": "Create new address",
+  "This is an example payment form. Do not use real card details!": "This is an example payment form. Do not use real card details!",
+  "Pay with": "Pay with",
+  "standard-payment": "standard-payment",
+  "Expiry": "Expiry"
 }

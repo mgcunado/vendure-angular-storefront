@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Inject, TemplateRef, Type } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, HostListener, Inject, TemplateRef, Type } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { Dialog, DIALOG_COMPONENT, MODAL_OPTIONS, ModalOptions } from '../../providers/modal/modal-types';
@@ -67,5 +67,11 @@ export class ModalDialogComponent<T extends Dialog<any>> implements AfterViewIni
         if (status === false) {
             this.closeModal();
         }
+    }
+
+    // Escape key closes modal
+    @HostListener('document:keydown.escape')
+    handleEscapeKey() {
+        this.closeModal();
     }
 }

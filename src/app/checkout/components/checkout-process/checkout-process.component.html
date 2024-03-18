@@ -27,12 +27,12 @@
                 <hr class="grey-line-bottom">
 
                 <vsf-address-card *ngIf="cart.shippingAddress?.streetLine1"
-                    class="w-48 block"
+                    class="block"
                     title="Shipping Address"
                     [address]="cart.shippingAddress">
                     <button class="btn-primary w-full border px-2 py-1 mt-2 rounded text-sm hover:bg-gray-600"
                         *ngIf="(activeStage$ | async) === 3"
-                        (click)="changeShippingAddress()">Change
+                        (click)="changeShippingAddress()">{{ 'Go back' | translate }}
                     </button>
                 </vsf-address-card>
             </div>
